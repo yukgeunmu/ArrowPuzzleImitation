@@ -47,6 +47,7 @@ public class InputManager : MonoBehaviour
         if (block == null)
             return;
 
+        block.PlayClickAnimation();
         block.TryMove();
     }
 }

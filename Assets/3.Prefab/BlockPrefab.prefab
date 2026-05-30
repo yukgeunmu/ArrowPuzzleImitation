@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2190481430651701290, guid: cd76ee728b47a144f9128c1da23cbbd6, type: 3}
+  m_Sprite: {fileID: -6476533822251832446, guid: 4d13e36bbc6671a4b9e1715f859e4903, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc246ac2a169780459cf1259dc42a4b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArrowBlock
-  GridPos: {x: 0, y: 0}
+  GridPos: {x: 0, y: 0, z: 0}
   Direction: 0
 --- !u!61 &8488234072008834685
 BoxCollider2D:

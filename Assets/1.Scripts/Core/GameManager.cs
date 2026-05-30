@@ -4,16 +4,21 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [SerializeField]
+    private GridManager gridManager;
+
     private void Awake()
     {
         Instance = this;
     }
 
-    public void CheckClear()
+    private void Start()
     {
-        if (FindAnyObjectByType<GridManager>().BlockCount == 0)
-        {
-            Debug.Log("Stage Clear");
-        }
+        gridManager.OnAllBlocksRemoved += ClearStage;
+    }
+
+    private void ClearStage()
+    {
+        Debug.Log("Stage Clear");
     }
 }

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cd76ee728b47a144f9128c1da23cbbd6
+guid: 4d13e36bbc6671a4b9e1715f859e4903
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2190481430651701290
-    second: "Descargar dise\xF1o de icono de flecha gratis_0"
+      213: -6476533822251832446
+    second: ArrowIcon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 500
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 512
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Descargar dise\xF1o de icono de flecha gratis_0"
+      name: ArrowIcon_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 735
-        height: 325
+        x: 5
+        y: 22
+        width: 90
+        height: 56
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a2885196147266e10800000000000000
-      internalID: 2190481430651701290
+      spriteID: 28b60e48dcabe16a0800000000000000
+      internalID: -6476533822251832446
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "Descargar dise\xF1o de icono de flecha gratis_0": 2190481430651701290
+      ArrowIcon_0: -6476533822251832446
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,27 +7,34 @@ public class GridManager : MonoBehaviour
     public int Width;
     public int Height;
 
-    private Dictionary<Vector2Int, ArrowBlock> blocks = new();
+    private Dictionary<Vector3, ArrowBlock> blocks = new();
+
+    public event Action OnAllBlocksRemoved;
 
     public int BlockCount => blocks.Count;
 
-    public void RegisterBlock(Vector2Int pos, ArrowBlock block)
+    public void RegisterBlock(Vector3 pos, ArrowBlock block)
     {
         blocks[pos] = block;
     }
 
-    public void RemoveBlock(Vector2Int pos)
+    public void RemoveBlock(Vector3 pos)
     {
-        if (blocks.ContainsKey(pos))
-            blocks.Remove(pos);
+
+        blocks.Remove(pos);
+
+        if (blocks.Count == 0)
+        {
+            OnAllBlocksRemoved?.Invoke();
+        }
     }
 
-    public bool HasBlock(Vector2Int pos)
+    public bool HasBlock(Vector3 pos)
     {
         return blocks.ContainsKey(pos);
     }
 
-    public ArrowBlock GetBlock(Vector2Int pos)
+    public ArrowBlock GetBlock(Vector3 pos)
     {
         blocks.TryGetValue(pos, out ArrowBlock block);
         return block;
@@ -34,9 +42,9 @@ public class GridManager : MonoBehaviour
 
 
 
-    public bool CanMove(Vector2Int startPos, Direction dir)
+    public bool CanMove(Vector3 startPos, Direction dir)
     {
-        Vector2Int currentPos = startPos;
+        Vector3 currentPos = startPos;
 
         while (true)
         {

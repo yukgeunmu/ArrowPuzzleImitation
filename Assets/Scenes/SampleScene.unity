@@ -254,6 +254,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ad7c5f20e912804eb60780723a1e076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  gridManager: {fileID: 871924961}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

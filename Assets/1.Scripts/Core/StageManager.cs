@@ -31,7 +31,7 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    private Vector3 GridToWorld(Vector2Int gridPos)
+    private Vector3 GridToWorld(Vector3 gridPos)
     {
         return new Vector3( gridPos.x, gridPos.y, 0);
     }

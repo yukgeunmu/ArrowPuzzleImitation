@@ -3,6 +3,6 @@ using UnityEngine;
 [System.Serializable]
 public class BlockInfo
 {
-    public Vector2Int Position;
+    public Vector3 Position;
     public Direction Direction;
 }
