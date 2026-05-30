@@ -30,9 +30,45 @@ public class ArrowBlock : MonoBehaviour
             return;
         }
 
-        UndoManager.Instance.RecordMove(this);
-        MoveOut();
+        UndoManager.Instance.Execute(new MoveCommand(this));
     }
+
+
+    //실제 이동 애매니메이션
+    public void ExitGrid()
+    {
+        IsMoving = true;
+
+        gridManager.RemoveBlock(GridPos);
+
+        Vector3 targetPos =
+            transform.position + Direction.ToVector() * 10f;
+
+        transform
+            .DOMove(targetPos, 0.35f)
+            .SetEase(Ease.OutQuad)
+            .OnComplete(() =>
+            {
+                gameObject.SetActive(false);
+            });
+    }
+
+    public void Restore(Vector3 position)
+    {
+        transform.DOKill();
+
+        gameObject.SetActive(true);
+
+        GridPos = position;
+
+        transform.position =
+            gridManager.GridToWorld(position);
+
+        gridManager.RegisterBlock(position, this);
+
+        IsMoving = false;
+    }
+
 
 
     //막힘 애니메이션
@@ -48,29 +84,6 @@ public class ArrowBlock : MonoBehaviour
     }
 
 
-    //실제 이동 애매니메이션
-    private void MoveOut()
-    {
-        IsMoving = true;
-
-        gridManager.RemoveBlock(GridPos);
-
-        Vector3 targetPos =
-            transform.position + Direction.ToVector() * 10f;
-
-        transform
-            .DOMove(targetPos, 0.35f)
-            .SetEase(Ease.InBack)
-            .OnComplete(OnExitFinished);
-    }
-
-
-    //제거 처리
-    private void OnExitFinished()
-    {
-        gameObject.SetActive(false);
-    }
-
 
     //플레이 클릭 애니메이션
     public void PlayClickAnimation()
@@ -81,20 +94,6 @@ public class ArrowBlock : MonoBehaviour
             {
                 transform.DOScale(1f, 0.05f);
             });
-    }
-
-
-    public void UndoMove(Vector3 previousPos)
-    {
-        gameObject.SetActive(true);
-
-        GridPos = previousPos;
-
-        transform.position = gridManager.GridToWorld(previousPos);
-
-        gridManager.RegisterBlock( previousPos, this);
-
-        IsMoving = false;
     }
 
 }
