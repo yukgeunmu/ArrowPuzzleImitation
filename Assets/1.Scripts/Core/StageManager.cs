@@ -23,7 +23,7 @@ public class StageManager : MonoBehaviour
 
         foreach (var info in stageData.Blocks)
         {
-            ArrowBlock block =  Instantiate(blockPrefab, GridToWorld(info.Position), Quaternion.identity);
+            ArrowBlock block =  Instantiate(blockPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
             block.Init( info.Position, info.Direction, gridManager);
 
@@ -31,8 +31,4 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    private Vector3 GridToWorld(Vector3 gridPos)
-    {
-        return new Vector3( gridPos.x, gridPos.y, 0);
-    }
 }

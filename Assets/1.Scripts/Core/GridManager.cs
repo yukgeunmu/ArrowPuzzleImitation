@@ -62,4 +62,10 @@ public class GridManager : MonoBehaviour
             }
         }
     }
+
+    public Vector3 GridToWorld(Vector3 gridPos)
+    {
+        return new Vector3(gridPos.x, gridPos.y, 0);
+    }
+
 }

@@ -30,6 +30,7 @@ public class ArrowBlock : MonoBehaviour
             return;
         }
 
+        UndoManager.Instance.RecordMove(this);
         MoveOut();
     }
 
@@ -67,7 +68,7 @@ public class ArrowBlock : MonoBehaviour
     //제거 처리
     private void OnExitFinished()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
 
@@ -82,5 +83,18 @@ public class ArrowBlock : MonoBehaviour
             });
     }
 
+
+    public void UndoMove(Vector3 previousPos)
+    {
+        gameObject.SetActive(true);
+
+        GridPos = previousPos;
+
+        transform.position = gridManager.GridToWorld(previousPos);
+
+        gridManager.RegisterBlock( previousPos, this);
+
+        IsMoving = false;
+    }
 
 }
