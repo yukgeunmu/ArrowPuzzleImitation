@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6038a6d0e5487418ac4ca09f609652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageManager
-  stageData: {fileID: 11400000, guid: a6e22b900cb264844bdbc3a54145304c, type: 2}
+  stageData: {fileID: 11400000, guid: 6ab6184fb0533424dad45f8e1451a915, type: 2}
   arrowPrefab: {fileID: 9157436410499582089, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
   obstaclePrefab: {fileID: 2474209452604915384, guid: e0620146bcb048145be72f71a9a75cd9, type: 3}
   gridManager: {fileID: 871924961}
@@ -1067,6 +1067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   Width: 10
   Height: 10
+  CellSize: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

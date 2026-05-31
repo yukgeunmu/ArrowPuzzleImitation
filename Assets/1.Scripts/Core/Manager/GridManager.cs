@@ -6,6 +6,7 @@ public class GridManager : MonoBehaviour
 {
     public int Width;
     public int Height;
+    public int CellSize;
 
     private Dictionary<Vector3, BlockBase> blocks = new();
 
@@ -65,7 +66,13 @@ public class GridManager : MonoBehaviour
 
     public Vector3 GridToWorld(Vector3 gridPos)
     {
-        return new Vector3(gridPos.x, gridPos.y, 0);
+        float offsetX = -(Width - 1) * CellSize * 0.5f;
+        float offsetY = -(Height - 1) * CellSize * 0.5f;
+
+        return new Vector3(
+            gridPos.x * CellSize + offsetX,
+            gridPos.y * CellSize + offsetY,
+            0f);
     }
 
 }
