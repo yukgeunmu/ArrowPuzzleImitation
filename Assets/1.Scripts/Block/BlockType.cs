@@ -1,6 +1,6 @@
 public enum BlockType
 {
-    Normal,
+    Arrow,
     Obstacle
 }
 

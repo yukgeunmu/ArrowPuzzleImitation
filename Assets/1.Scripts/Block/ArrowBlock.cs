@@ -1,9 +1,10 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class ArrowBlock : MonoBehaviour
+public class ArrowBlock : BlockBase
 {
-    public Vector3 GridPos;
+    public override bool IsMovable =>  true;
+
     public Direction Direction;
 
     private GridManager gridManager;

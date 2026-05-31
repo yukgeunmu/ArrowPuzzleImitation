@@ -15,9 +15,12 @@ MonoBehaviour:
   Width: 5
   Height: 5
   Blocks:
-  - Position: {x: 0, y: 0, z: 0}
+  - Type: 1
+    Position: {x: 0, y: 0, z: 0}
     Direction: 0
-  - Position: {x: 0, y: 1, z: 0}
-    Direction: 0
-  - Position: {x: 1, y: 0, z: 0}
+  - Type: 0
+    Position: {x: 1, y: 1, z: 0}
     Direction: 3
+  - Type: 0
+    Position: {x: 1, y: 0, z: 0}
+    Direction: 2

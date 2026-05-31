@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 9157436410499582089}
   - component: {fileID: 8488234072008834685}
   m_Layer: 0
-  m_Name: BlockPrefab
+  m_Name: ArrowBlockPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

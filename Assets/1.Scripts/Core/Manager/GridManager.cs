@@ -7,13 +7,13 @@ public class GridManager : MonoBehaviour
     public int Width;
     public int Height;
 
-    private Dictionary<Vector3, ArrowBlock> blocks = new();
+    private Dictionary<Vector3, BlockBase> blocks = new();
 
     public event Action OnAllBlocksRemoved;
 
     public int BlockCount => blocks.Count;
 
-    public void RegisterBlock(Vector3 pos, ArrowBlock block)
+    public void RegisterBlock(Vector3 pos, BlockBase block)
     {
         blocks[pos] = block;
     }
@@ -34,9 +34,9 @@ public class GridManager : MonoBehaviour
         return blocks.ContainsKey(pos);
     }
 
-    public ArrowBlock GetBlock(Vector3 pos)
+    public BlockBase GetBlock(Vector3 pos)
     {
-        blocks.TryGetValue(pos, out ArrowBlock block);
+        blocks.TryGetValue(pos, out var block);
         return block;
     }
 
@@ -50,7 +50,7 @@ public class GridManager : MonoBehaviour
         {
             currentPos += dir.ToVector();
 
-            if (HasBlock(currentPos))
+            if (GetBlock(currentPos) !=  null)
                 return false;
 
             if (currentPos.x < 0 ||
