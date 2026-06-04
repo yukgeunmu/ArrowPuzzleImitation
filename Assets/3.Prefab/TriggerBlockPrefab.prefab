@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &4874348779084688755
+--- !u!1001 &6011166527810360160
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -50,58 +50,49 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3504527069654604079, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       propertyPath: m_Name
-      value: ObstacleBlockPrefab
+      value: TriggerBlockPrefab
       objectReference: {fileID: 0}
     - target: {fileID: 4991822209107744379, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 5510199271981203321, guid: 259975fc4c8966347ac68e6b4b19d24f, type: 3}
+      objectReference: {fileID: 823559628070173429, guid: 31508c59fd9eae940a1eb0a4c5f4105c, type: 3}
     - target: {fileID: 4991822209107744379, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       propertyPath: m_Color.b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4991822209107744379, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       propertyPath: m_Color.g
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4991822209107744379, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       propertyPath: m_Color.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4991822209107744379, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
-      propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 7792839490748770332, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 5510199271981203321, guid: 259975fc4c8966347ac68e6b4b19d24f, type: 3}
     m_RemovedComponents:
     - {fileID: 9157436410499582089, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
-    - {fileID: 2817112988817574381, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
-    m_RemovedGameObjects:
-    - {fileID: 7534195352571060205, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3504527069654604079, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2474209452604915384}
+      addedObject: {fileID: 5592008788481051283}
   m_SourcePrefab: {fileID: 100100000, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
---- !u!1 &8288803297829287004 stripped
+--- !u!1 &7190384754785126991 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3504527069654604079, guid: 0a2d1b038e5062542b4d637127bf46d8, type: 3}
-  m_PrefabInstance: {fileID: 4874348779084688755}
+  m_PrefabInstance: {fileID: 6011166527810360160}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2474209452604915384
+--- !u!114 &5592008788481051283
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8288803297829287004}
+  m_GameObject: {fileID: 7190384754785126991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c81bb791692ea848a9b20d45ab965dc, type: 3}
+  m_Script: {fileID: 11500000, guid: eb1fdeb32f4142a4cb089bf8f67357d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObstacleBlock
+  m_EditorClassIdentifier: Assembly-CSharp::TriggerBlock
   GridPos: {x: 0, y: 0, z: 0}
+  <ChangeDirection>k__BackingField: 0

@@ -1,7 +1,8 @@
 public enum BlockType
 {
     Arrow,
-    Obstacle
+    Obstacle,
+    Trigger,
 }
 
 public enum Direction

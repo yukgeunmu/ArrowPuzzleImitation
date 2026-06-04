@@ -1,24 +1,32 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MoveCommand : ICommand
 {
     private ArrowBlock block;
 
-    private Vector3 previousPos;
+    private List<Vector3> previousCells;
+
+    private Direction previousDirection;
+
+
+
 
     public MoveCommand(ArrowBlock block)
     {
         this.block = block;
-        previousPos = block.GridPos;
+
+        previousCells = new List<Vector3>(block.Cells);
+        previousDirection = block.HeadDirection;
     }
 
     public void Execute()
     {
-        block.ExitGrid();
+        block.StartMove();
     }
 
     public void Undo()
     {
-        block.Restore(previousPos);
+        block.Restore(previousCells, previousDirection);
     }
 }

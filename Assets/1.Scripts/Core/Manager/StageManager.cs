@@ -1,7 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
+
+    public static StageManager instance;
+
+    [SerializeField]
+    private CameraController cameraController;
+
     [SerializeField]
     private StageDataSO stageData;
 
@@ -14,6 +21,14 @@ public class StageManager : MonoBehaviour
     [SerializeField]
     private GridManager gridManager;
 
+    public List<ArrowBlock> ArrowBlocks = new();
+
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private void Start()
     {
         LoadStage();
@@ -21,34 +36,41 @@ public class StageManager : MonoBehaviour
 
     private void LoadStage()
     {
+
         gridManager.Width = stageData.Width;
         gridManager.Height = stageData.Height;
 
+        gridManager.Initialize(stageData.Width, stageData.Height);
+
         foreach (var info in stageData.Blocks)
         {
-            BlockBase block = null;
-
             switch (info.Type)
             {
                 case BlockType.Arrow:
-                    block = Instantiate(arrowPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
+                    ArrowBlock arrow = Instantiate(arrowPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
-                    ((ArrowBlock)block).Init(info.Position, info.Direction, gridManager);
+                    arrow.Init(info.Cells, info.HeadDirection ,gridManager);
+
+                    ArrowBlocks.Add(arrow);
+
+                    gridManager.RegisterBlock(arrow);
 
                     break;
                 case BlockType.Obstacle:
 
-                    block = Instantiate(obstaclePrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
+                    ObstacleBlock obstacle = Instantiate(obstaclePrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
-                    block.GridPos = info.Position;
+                    obstacle.GridPos = info.Position;
+
+                    gridManager.RegisterBlock(obstacle);
 
                     break;
             }
 
-            gridManager.RegisterBlock(info.Position, block);
         }
 
-        
+        cameraController.FitToGrid(stageData.Width, stageData.Height);
+
     }
 
 }
