@@ -25,8 +25,9 @@ public class ArrowBlock : BlockBase
     [SerializeField] private float shrinkDuration = 0.3f; // 원래대로 돌아오는 데 걸리는 시간
 
 
-    public List<Vector3> Cells { get; private set; }
+    public int Id;
 
+    public List<Vector3> Cells { get; private set; }
 
     public Direction HeadDirection;
 
@@ -39,14 +40,24 @@ public class ArrowBlock : BlockBase
     private GridManager gridManager;
 
 
-    public void Init(List<Vector3> cells,Direction headDirection , GridManager gridManager)
+    public void Init(List<Vector3> cells,Direction headDirection , GridManager gridManager, int Id)
     {
+        if(Cells != null)
+            ResetState();
 
         Cells = new List<Vector3>(cells);
 
         this.HeadDirection = headDirection;
 
         this.gridManager = gridManager;
+
+        this.Id = Id;
+
+        this.lineRenderer.startWidth = normalWidth;
+        this.lineRenderer.endWidth = normalWidth;
+        this.lineRenderer.startColor = Color.black;
+        this.lineRenderer.endColor = Color.black;
+        this.headVisual.transform.localScale = Vector3.one;
 
         RefreshVisual();
     }
@@ -274,5 +285,39 @@ public class ArrowBlock : BlockBase
 
     }
 
+    public void PlayHint()
+    {
+        StartCoroutine(HintRoutine());
+    }
 
+    private IEnumerator HintRoutine()
+    {
+        Color origin = lineRenderer.startColor;
+
+        for (int i = 0; i < 3; i++)
+        {
+            lineRenderer.startColor = Color.yellow;
+
+            lineRenderer.endColor = Color.yellow;
+
+            yield return
+                new WaitForSeconds(
+                    0.2f);
+
+            lineRenderer.startColor = origin;
+
+            lineRenderer.endColor = origin;
+
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    public void ResetState()
+    {
+        transform.DOKill();
+
+        Cells.Clear();
+
+        isMoving = false;
+    }
 }

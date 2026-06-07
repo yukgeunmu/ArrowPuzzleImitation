@@ -20,6 +20,9 @@ public class HUDUI : MonoBehaviour
     [SerializeField]
     private Button stageSelectButton;
 
+    [SerializeField]
+    private Button hintButton;
+
     private void Awake()
     {
         Init();
@@ -31,6 +34,7 @@ public class HUDUI : MonoBehaviour
         restartButton.onClick.AddListener(OnRestart);
         resetButton.onClick.AddListener(OnReset);
         stageSelectButton.onClick.AddListener(OpenStageSelect);
+        hintButton.onClick.AddListener(OnHint);
 
     }
 
@@ -62,6 +66,11 @@ public class HUDUI : MonoBehaviour
     {
         SoundManager.Instance.Play(SFXType.Button);
         StageManager.instance.ShowStageSelect();
+    }
+
+    private void OnHint()
+    {
+        HintManager.instance.ShowHint();
     }
 
 

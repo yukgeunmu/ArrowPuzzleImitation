@@ -42,7 +42,12 @@ public class StageManager : MonoBehaviour
     [SerializeField]
     private GridManager gridManager;
 
+
+    public GridManager GridManager => gridManager;
+
     public List<ArrowBlock> ArrowBlocks = new();
+
+    public List<ObstacleBlock> ObstacleBlocks = new();
 
 
     private void Awake()
@@ -64,6 +69,8 @@ public class StageManager : MonoBehaviour
 
     private void LoadStage()
     {
+        int nextArrowId = 0;
+
         hUDUI.SetStage(currentStageIndex + 1);
 
         gridManager.Width = CurrentStage.Width;
@@ -76,9 +83,13 @@ public class StageManager : MonoBehaviour
             switch (info.Type)
             {
                 case BlockType.Arrow:
-                    ArrowBlock arrow = Instantiate(arrowPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
+                    //ArrowBlock arrow = Instantiate(arrowPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
-                    arrow.Init(info.Cells, info.HeadDirection ,gridManager);
+                    ArrowBlock arrow = ArrowPool.Instance.Get();
+
+                    arrow.transform.SetPositionAndRotation(gridManager.GridToWorld(info.Position), Quaternion.identity);
+
+                    arrow.Init(info.Cells, info.HeadDirection ,gridManager, nextArrowId++);
 
                     ArrowBlocks.Add(arrow);
 
@@ -90,6 +101,8 @@ public class StageManager : MonoBehaviour
                     ObstacleBlock obstacle = Instantiate(obstaclePrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
                     obstacle.GridPos = info.Position;
+
+                    ObstacleBlocks.Add(obstacle);
 
                     gridManager.RegisterBlock(obstacle);
 
@@ -136,7 +149,7 @@ public class StageManager : MonoBehaviour
         {
             if (arrow != null)
             {
-                Destroy(arrow.gameObject);
+                arrow.gameObject.SetActive(false);
             }
         }
 
@@ -180,5 +193,10 @@ public class StageManager : MonoBehaviour
     public void ShowStageSelect()
     {
         stageSelectUI.Show();
+    }
+
+    public ArrowBlock GetArrowById( int id)
+    {
+        return ArrowBlocks.Find( x => x.Id == id);
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StageDatabase
   m_EditorClassIdentifier: Assembly-CSharp::StageDatabaseSO
   Stages:
-  - {fileID: 11400000, guid: e712ec2547374f349bb3c6d3498727df, type: 2}
+  - {fileID: 11400000, guid: a6e22b900cb264844bdbc3a54145304c, type: 2}
   - {fileID: 11400000, guid: 6ab6184fb0533424dad45f8e1451a915, type: 2}
   - {fileID: 11400000, guid: 25cf21b78c841784d8f78b87ea0b70a1, type: 2}
   - {fileID: 11400000, guid: 747b8e76368e13d44afd739b39164d11, type: 2}

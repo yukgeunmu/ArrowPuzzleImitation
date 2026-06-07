@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class SolverStateFactory
@@ -36,6 +37,38 @@ public static class SolverStateFactory
 
                     break;
             }
+        }
+
+        return state;
+    }
+
+    public static SolverState CreateFromStageManager(
+    StageManager stageManager)
+    {
+        SolverState state = new();
+
+        state.Width =
+            stageManager.GridManager.Width;
+
+        state.Height =
+            stageManager.GridManager.Height;
+
+        foreach (var arrow in stageManager.ArrowBlocks)
+        {
+            SolverArrow solverArrow = new();
+
+            solverArrow.Id = arrow.Id;
+
+            solverArrow.HeadDirection = arrow.HeadDirection;
+
+            solverArrow.Cells = new List<Vector3>(arrow.Cells);
+
+            state.Arrows.Add(solverArrow);
+        }
+
+        foreach (var obstacle in stageManager.ObstacleBlocks)
+        {
+            state.Obstacles.Add(obstacle.GridPos);
         }
 
         return state;
