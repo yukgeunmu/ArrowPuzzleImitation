@@ -42,10 +42,9 @@ public class InputManager : MonoBehaviour
         if (hit.collider == null)
             return;
 
-        if (hit.collider.TryGetComponent<ArrowSegment>(out ArrowSegment segment))
+        if (hit.collider.TryGetComponent<ArrowBlock>(out ArrowBlock arrow))
         {
-            segment.Owner.PlayClickAnimation();
-            segment.Owner.TryMove();
+            arrow.TryMove();
         }
     }
 }

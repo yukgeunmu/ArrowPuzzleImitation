@@ -121,13 +121,20 @@ public class GridManager : MonoBehaviour
 
     public Vector3 GridToWorld(Vector3 gridPos)
     {
-        float offsetX = -(Width - 1) * CellSize * 0.5f;
-        float offsetY = -(Height - 1) * CellSize * 0.5f;
+        Vector2 offset = Offset();
 
         return new Vector3(
-            gridPos.x * CellSize + offsetX,
-            gridPos.y * CellSize + offsetY,
+            gridPos.x * CellSize - offset.x,
+            gridPos.y * CellSize - offset.y,
             0f);
+    }
+
+    public Vector2 Offset()
+    {
+        float offsetX = (Width - 1) * CellSize * 0.5f;
+        float offsetY = (Height - 1) * CellSize * 0.5f;
+
+        return new Vector2(offsetX, offsetY);
     }
 
 

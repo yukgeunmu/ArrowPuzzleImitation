@@ -10,7 +10,28 @@ public class StageManager : MonoBehaviour
     private CameraController cameraController;
 
     [SerializeField]
-    private StageDataSO stageData;
+    private StageDatabaseSO stageDatabase;
+
+    [SerializeField]
+    private ClearPopupUI clearPopupUI;
+
+    [SerializeField]
+    private HUDUI hUDUI;
+
+    [SerializeField]
+    private StageSelectUI stageSelectUI;
+
+    private int currentStageIndex;
+
+    public int CurrentStageIndex => currentStageIndex;
+
+    public StageDataSO CurrentStage
+    {
+        get
+        {
+            return stageDatabase.Stages[currentStageIndex];
+        }
+    }
 
     [SerializeField]
     private ArrowBlock arrowPrefab;
@@ -31,18 +52,26 @@ public class StageManager : MonoBehaviour
 
     private void Start()
     {
+        currentStageIndex = SaveManager.CurrentStage;
+
+
+        stageSelectUI.Init(stageDatabase.Stages.Count);
+
         LoadStage();
+
+        gridManager.OnAllBlocksRemoved += HandleStageClear;
     }
 
     private void LoadStage()
     {
+        hUDUI.SetStage(currentStageIndex + 1);
 
-        gridManager.Width = stageData.Width;
-        gridManager.Height = stageData.Height;
+        gridManager.Width = CurrentStage.Width;
+        gridManager.Height = CurrentStage.Height;
 
-        gridManager.Initialize(stageData.Width, stageData.Height);
+        gridManager.Initialize(CurrentStage.Width, CurrentStage.Height);
 
-        foreach (var info in stageData.Blocks)
+        foreach (var info in CurrentStage.Blocks)
         {
             switch (info.Type)
             {
@@ -69,8 +98,87 @@ public class StageManager : MonoBehaviour
 
         }
 
-        cameraController.FitToGrid(stageData.Width, stageData.Height);
+        cameraController.FitToGrid(CurrentStage.Width, CurrentStage.Height);
 
     }
 
+    private void HandleStageClear()
+    {
+        clearPopupUI.Show();
+        SoundManager.Instance.Play(SFXType.Clear);
+    }
+
+    public void NextStage()
+    {
+        clearPopupUI.Hide();
+
+        currentStageIndex++;
+
+        SaveManager.CurrentStage = currentStageIndex;
+
+        if (currentStageIndex >= stageDatabase.Stages.Count)
+        {
+            currentStageIndex = stageDatabase.Stages.Count - 1;
+
+            Debug.Log("All Clear");
+
+            return;
+        }
+
+        ClearCurrentStage();
+
+        LoadStage();
+    }
+
+    private void ClearCurrentStage()
+    {
+        foreach (var arrow in ArrowBlocks)
+        {
+            if (arrow != null)
+            {
+                Destroy(arrow.gameObject);
+            }
+        }
+
+
+        ArrowBlocks.Clear();
+
+        UndoManager.Instance.Clear();
+    }
+
+    public void RetryStage()
+    {
+        clearPopupUI.Hide();
+
+        ClearCurrentStage();
+
+        LoadStage();
+    }
+
+
+    public void ResetProgress()
+    {
+        SaveManager.Clear();
+
+        currentStageIndex = 0;
+
+        RetryStage();
+    }
+
+
+    public void LoadStage(int stageIndex)
+    {
+        UndoManager.Instance.Clear();
+
+        currentStageIndex = stageIndex;
+
+        ClearCurrentStage();
+
+        LoadStage();
+    }
+
+    public void ShowStageSelect()
+    {
+        stageSelectUI.Show();
+    }
 }

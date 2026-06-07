@@ -1,17 +1,28 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public class ArrowBlock : BlockBase
 {
     [SerializeField]
     private LineRenderer lineRenderer;
+    private Coroutine clickAnimRoutine;
 
     [SerializeField]
-    private ArrowSegment headVisual;
+    private Transform headVisual;
 
-    public int Id;
+    [SerializeField]
+    private EdgeCollider2D edgeCollider;
+
+
+    [Header("두께 설정")]
+    [SerializeField] private float normalWidth = 0.25f;    // 평소 두께
+    [SerializeField] private float targetWidth = 0.1f;    // 클릭했을 때 최대 두께
+
+    [Header("애니메이션 속도")]
+    [SerializeField] private float shrinkDuration = 0.3f; // 원래대로 돌아오는 데 걸리는 시간
 
 
     public List<Vector3> Cells { get; private set; }
@@ -25,41 +36,37 @@ public class ArrowBlock : BlockBase
 
     private bool isMoving;
 
-
-    public override bool IsMovable =>  true;
-
-    public int LinkGroupId = -1;
-
     private GridManager gridManager;
 
 
     public void Init(List<Vector3> cells,Direction headDirection , GridManager gridManager)
     {
+
         Cells = new List<Vector3>(cells);
 
         this.HeadDirection = headDirection;
 
         this.gridManager = gridManager;
 
-        headVisual.Init(this);
-
         RefreshVisual();
-
-        //CreateVisual();
     }
 
 
     public void TryMove()
     {
+        PlayClickAnimation();
+
         if (isMoving)
             return;
 
         if (!gridManager.CanMoveShape(this))
         {
+            SoundManager.Instance.Play(SFXType.Blocked);
             PlayBlockedAnimation();
             return;
         }
 
+        SoundManager.Instance.Play(SFXType.Move);
         UndoManager.Instance.Execute(new MoveCommand(this));
            
     }
@@ -131,13 +138,16 @@ public class ArrowBlock : BlockBase
     public void RefreshVisual()
     {
         lineRenderer.positionCount = Cells.Count;
-
+        List<Vector2> edgePoints = new List<Vector2>();
 
         for (int i = 0; i < Cells.Count; i++)
         {
-            lineRenderer.SetPosition( i, gridManager.GridToWorld(Cells[i]));
+            lineRenderer.SetPosition( i, Cells[i]);
+            edgePoints.Add(Cells[i]);
         }
 
+        edgeCollider.SetPoints(edgePoints);
+        
         UpdateHead();
     }
 
@@ -163,7 +173,8 @@ public class ArrowBlock : BlockBase
         };
     }
 
-    //실제 이동 애매니메이션 -- 삭제예정
+
+
     public void ExitGrid()
     {
         gridManager.RemoveBlock(this);
@@ -206,13 +217,15 @@ public class ArrowBlock : BlockBase
     //막힘 애니메이션
     private void PlayBlockedAnimation()
     {
-        //Vector3 dir = Direction.ToVector() * 0.15f;
+        transform.DOKill();
 
-        //transform .DOPunchPosition(
-        //        dir,
-        //        0.2f,
-        //        5,
-        //        0.5f);
+        transform.DOShakePosition(
+            0.15f,
+            0.15f,
+            10,
+            90f,
+            false,
+            true);
     }
 
 
@@ -220,15 +233,46 @@ public class ArrowBlock : BlockBase
     //플레이 클릭 애니메이션
     public void PlayClickAnimation()
     {
-        transform
-            .DOScale(0.85f, 0.05f)
-            .OnComplete(() =>
-            {
-                transform.DOScale(1f, 0.05f);
-            });
+        if (clickAnimRoutine != null)
+        {
+            StopCoroutine(clickAnimRoutine);
+        }
+
+
+        clickAnimRoutine = StartCoroutine(PlayLineAnimation());
+
     }
 
+    IEnumerator PlayLineAnimation()
+    {
+        lineRenderer.startWidth = targetWidth;
+        lineRenderer.endWidth = targetWidth;
 
+        float percent = targetWidth / normalWidth;
+
+        float timeElapsed = 0f;
+
+        while (timeElapsed < shrinkDuration)
+        {
+            timeElapsed += Time.deltaTime;
+            float progress = timeElapsed / shrinkDuration;
+
+            float currentWidth = Mathf.Lerp(targetWidth, normalWidth, progress);
+            float headScale = Mathf.Lerp(percent, 1, progress);
+
+            lineRenderer.startWidth = currentWidth;
+            lineRenderer.endWidth = currentWidth;
+
+            headVisual.transform.localScale = new Vector3(headScale, headScale, 1);
+
+            yield return null; // 다음 프레임까지 대기
+        }
+
+        // 3. 완벽하게 원래 두께로 고정
+        lineRenderer.startWidth = normalWidth;
+        lineRenderer.endWidth = normalWidth;
+
+    }
 
 
 }

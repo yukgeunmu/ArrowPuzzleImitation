@@ -29,4 +29,9 @@ public class UndoManager : MonoBehaviour
 
         command.Undo();
     }
+
+    public void Clear()
+    {
+        history.Clear();
+    }
 }
