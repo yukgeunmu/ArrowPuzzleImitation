@@ -29,5 +29,10 @@ public class SolverTest : MonoBehaviour
 
         Debug.Log(result.Difficulty);
 
+        foreach (var move in result.Path)
+        {
+            Debug.Log(move);
+        }
+
     }
 }

@@ -1,8 +1,12 @@
+using System.Collections.Generic;
+
 public class SolverResult
 {
     public bool CanSolve;
 
     public int MinMoves;
+
+    public List<int> Path = new();
 
     public string Difficulty
     {

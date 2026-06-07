@@ -9,7 +9,7 @@ public static class PuzzleSolver
 
         HashSet<string> visited = new();
 
-        queue.Enqueue(new SolverNode(startState, 0));
+        queue.Enqueue(new SolverNode(startState, 0, null, -1));
 
         visited.Add(startState.GetKey());
 
@@ -19,11 +19,7 @@ public static class PuzzleSolver
 
             if (SolverChecker.IsClear(current.State))
             {
-                return new SolverResult
-                {
-                    CanSolve = true,
-                    MinMoves = current.Depth
-                };
+                return BuildResult(current);
             }
 
             ExpandNode(current, queue,visited);
@@ -61,7 +57,30 @@ public static class PuzzleSolver
 
             visited.Add(key);
 
-            queue.Enqueue( new SolverNode(nextState, current.Depth + 1));
+            queue.Enqueue( new SolverNode(nextState, current.Depth + 1, current, state.Arrows[i].Id));
         }
+    }
+
+    private static SolverResult BuildResult(SolverNode goalNode)
+    {
+        List<int> path = new();
+
+        SolverNode current = goalNode;
+
+        while (current.Parent != null)
+        {
+            path.Add(current.SelectedArrowId);
+
+            current = current.Parent;
+        }
+
+        path.Reverse();
+
+        return new SolverResult
+        {
+            CanSolve = true,
+            MinMoves = goalNode.Depth,
+            Path = path
+        };
     }
 }

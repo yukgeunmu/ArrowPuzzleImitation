@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SolverArrow
 {
+    public int Id;
+
     public List<Vector3> Cells = new();
 
     public Direction HeadDirection;
@@ -10,6 +12,8 @@ public class SolverArrow
     public SolverArrow Clone()
     {
         SolverArrow clone = new();
+
+        clone.Id = Id;
 
         clone.HeadDirection = HeadDirection;
 

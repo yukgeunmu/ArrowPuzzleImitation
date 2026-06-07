@@ -9,6 +9,9 @@ public static class SolverStateFactory
         state.Width = stageData.Width;
         state.Height = stageData.Height;
 
+        int arrowId = 0;
+
+
         foreach (var block in stageData.Blocks)
         {
             switch (block.Type)
@@ -16,6 +19,8 @@ public static class SolverStateFactory
                 case BlockType.Arrow:
 
                     SolverArrow arrow = new();
+
+                    arrow.Id = arrowId++;
 
                     arrow.HeadDirection = block.HeadDirection;
 
