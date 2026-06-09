@@ -1,137 +1,81 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class StageManager : MonoBehaviour
+public class StageManager
 {
-
-    public static StageManager instance;
-
-    [SerializeField]
-    private CameraController cameraController;
-
-    [SerializeField]
-    private StageDatabaseSO stageDatabase;
-
-    [SerializeField]
-    private ClearPopupUI clearPopupUI;
-
-    [SerializeField]
-    private HUDUI hUDUI;
-
-    [SerializeField]
-    private StageSelectUI stageSelectUI;
-
     private int currentStageIndex;
 
-    public int CurrentStageIndex => currentStageIndex;
-
-    public StageDataSO CurrentStage
-    {
-        get
-        {
-            return stageDatabase.Stages[currentStageIndex];
-        }
-    }
-
-    [SerializeField]
-    private ArrowBlock arrowPrefab;
-
-    [SerializeField]
-    private ObstacleBlock obstaclePrefab;
-
-    [SerializeField]
-    private GridManager gridManager;
-
-
-    public GridManager GridManager => gridManager;
+    public int StageLength;
 
     public List<ArrowBlock> ArrowBlocks = new();
 
-    public List<ObstacleBlock> ObstacleBlocks = new();
+    public event Action<int, int> OnStageLoaded;
 
-
-    private void Awake()
-    {
-        instance = this;
-    }
-
-    private void Start()
+    public void Init()
     {
         currentStageIndex = SaveManager.CurrentStage;
 
-
-        stageSelectUI.Init(stageDatabase.Stages.Count);
-
         LoadStage();
 
-        gridManager.OnAllBlocksRemoved += HandleStageClear;
+        Manager.Instance.Grid.OnAllBlocksRemoved += HandleStageClear;
     }
 
     private void LoadStage()
     {
         int nextArrowId = 0;
 
-        hUDUI.SetStage(currentStageIndex + 1);
+        StageLength = Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count;
 
-        gridManager.Width = CurrentStage.Width;
-        gridManager.Height = CurrentStage.Height;
+        StageDataSO stage = Manager.Instance.Resource.GetData<StageDataSO>("Stage", $"Stage{currentStageIndex + 1}");
 
-        gridManager.Initialize(CurrentStage.Width, CurrentStage.Height);
+        Manager.Instance.UI.GetScene<HUDUI>().SetStage(currentStageIndex + 1);
 
-        foreach (var info in CurrentStage.Blocks)
+        Manager.Instance.Grid.Init(stage.Width, stage.Height);
+
+        foreach (var info in stage.Blocks)
         {
             switch (info.Type)
             {
                 case BlockType.Arrow:
-                    //ArrowBlock arrow = Instantiate(arrowPrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
 
-                    ArrowBlock arrow = ArrowPool.Instance.Get();
+                    ArrowBlock arrow = Manager.Instance.Pool.Get();
 
-                    arrow.transform.SetPositionAndRotation(gridManager.GridToWorld(info.Position), Quaternion.identity);
+                    arrow.transform.SetPositionAndRotation(Manager.Instance.Grid.GridToWorld(info.Position), Quaternion.identity);
 
-                    arrow.Init(info.Cells, info.HeadDirection ,gridManager, nextArrowId++);
+                    arrow.Init(info.Cells, info.HeadDirection , nextArrowId++);
 
                     ArrowBlocks.Add(arrow);
 
-                    gridManager.RegisterBlock(arrow);
-
-                    break;
-                case BlockType.Obstacle:
-
-                    ObstacleBlock obstacle = Instantiate(obstaclePrefab, gridManager.GridToWorld(info.Position), Quaternion.identity);
-
-                    obstacle.GridPos = info.Position;
-
-                    ObstacleBlocks.Add(obstacle);
-
-                    gridManager.RegisterBlock(obstacle);
+                    Manager.Instance.Grid.RegisterBlock(arrow);
 
                     break;
             }
 
         }
 
-        cameraController.FitToGrid(CurrentStage.Width, CurrentStage.Height);
+        OnStageLoaded?.Invoke(stage.Width, stage.Height);
 
     }
 
     private void HandleStageClear()
     {
-        clearPopupUI.Show();
-        SoundManager.Instance.Play(SFXType.Clear);
+        _ = Manager.Instance.UI.ShowPopup<ClearPopupUI>();
+        Manager.Instance.Sound.Play(SFXType.Clear);
     }
 
     public void NextStage()
     {
-        clearPopupUI.Hide();
+        Manager.Instance.UI.ClosePopup();
 
         currentStageIndex++;
 
         SaveManager.CurrentStage = currentStageIndex;
 
-        if (currentStageIndex >= stageDatabase.Stages.Count)
+        if (currentStageIndex >= Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count)
         {
-            currentStageIndex = stageDatabase.Stages.Count - 1;
+            currentStageIndex = Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count - 1;
 
             Debug.Log("All Clear");
 
@@ -156,12 +100,12 @@ public class StageManager : MonoBehaviour
 
         ArrowBlocks.Clear();
 
-        UndoManager.Instance.Clear();
+        Manager.Instance.Undo.Clear();
     }
 
     public void RetryStage()
     {
-        clearPopupUI.Hide();
+        Manager.Instance.UI.ClosePopup();
 
         ClearCurrentStage();
 
@@ -181,7 +125,7 @@ public class StageManager : MonoBehaviour
 
     public void LoadStage(int stageIndex)
     {
-        UndoManager.Instance.Clear();
+        Manager.Instance.Undo.Clear();
 
         currentStageIndex = stageIndex;
 
@@ -190,10 +134,6 @@ public class StageManager : MonoBehaviour
         LoadStage();
     }
 
-    public void ShowStageSelect()
-    {
-        stageSelectUI.Show();
-    }
 
     public ArrowBlock GetArrowById( int id)
     {

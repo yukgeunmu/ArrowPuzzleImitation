@@ -33,6 +33,12 @@ public class CameraController : MonoBehaviour
     private float minY;
     private float maxY;
 
+
+    private void Start()
+    {
+        Manager.Instance.Stage.OnStageLoaded += FitToGrid;
+    }
+
     private void Update()
     {
         HandleMouseZoom();

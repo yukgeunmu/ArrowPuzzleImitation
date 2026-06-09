@@ -1,17 +1,10 @@
 using UnityEngine;
 
-public class HintManager : MonoBehaviour
+public class HintManager
 {
-    public static HintManager instance;
-
-    private void Awake()
-    {
-        instance = this;
-    }
-
     public void ShowHint()
     {
-        SolverState state = SolverStateFactory.CreateFromStageManager(StageManager.instance);
+        SolverState state = SolverStateFactory.CreateFromStageManager(Manager.Instance.Stage);
 
         SolverResult result =
             PuzzleSolver.Solve(state);
@@ -25,7 +18,7 @@ public class HintManager : MonoBehaviour
         int arrowId =
             result.Path[0];
 
-        ArrowBlock arrow = StageManager.instance.GetArrowById(arrowId);
+        ArrowBlock arrow = Manager.Instance.Stage.GetArrowById(arrowId);
 
         arrow.PlayHint();
     }

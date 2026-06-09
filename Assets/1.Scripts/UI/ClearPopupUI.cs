@@ -2,11 +2,8 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ClearPopupUI : MonoBehaviour
+public class ClearPopupUI : PopupUI
 {
-    [SerializeField]
-    private GameObject root;
-
     [SerializeField]
     private Button nextButton;
 
@@ -20,27 +17,34 @@ public class ClearPopupUI : MonoBehaviour
 
     public void Init()
     {
+        Open();
 
-        nextButton.onClick.AddListener(
-            StageManager.instance.NextStage);
+        nextButton.onClick.AddListener(OnClickNextButton);
 
-        retryButton.onClick.AddListener(
-            StageManager.instance.RetryStage);
+        retryButton.onClick.AddListener(OnClickRetryButton);
     }
 
-    public void Show()
+
+    public override void Open()
     {
-        root.SetActive(true);
+        base.Open();
 
-        root.transform.localScale = Vector3.zero;
+        this.transform.localScale = Vector3.zero;
 
-        root.transform
+        this.transform
             .DOScale(1f, 0.25f)
             .SetEase(Ease.OutBack);
     }
 
-    public void Hide()
+    public void OnClickNextButton()
     {
-        root.SetActive(false);
+        OnClickAnimation();
+        Manager.Instance.Stage.NextStage();
+    }
+
+    public void OnClickRetryButton()
+    {
+        OnClickAnimation();
+        Manager.Instance.Stage.RetryStage();
     }
 }

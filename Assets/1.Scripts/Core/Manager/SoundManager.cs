@@ -10,56 +10,30 @@ public enum SFXType
     Clear
 }
 
-public class SoundManager : MonoBehaviour
+public class SoundManager
 {
-    public static SoundManager Instance;
 
-    [SerializeField]
     private AudioSource sfxSource;
 
-    [SerializeField]
-    private AudioClip buttonClip;
+    private GameObject soundRoot;
 
-    [SerializeField]
-    private AudioClip moveClip;
 
-    [SerializeField]
-    private AudioClip blockedClip;
-
-    [SerializeField]
-    private AudioClip undoClip;
-
-    [SerializeField]
-    private AudioClip clearClip;
-
-    private void Awake()
+    public void Init()
     {
-        Instance = this;
+        soundRoot = new GameObject("SoundManager");
+
+        soundRoot.transform.SetParent(Manager.Instance.transform);
+
+        sfxSource = soundRoot.AddComponent<AudioSource>();
+
+        sfxSource.playOnAwake = false;
+
     }
 
     public void Play(SFXType type)
     {
-        switch (type)
-        {
-            case SFXType.Button:
-                sfxSource.PlayOneShot(buttonClip);
-                break;
+        var clip = Manager.Instance.Resource.GetData<AudioClip>("Sound", type.ToString());
 
-            case SFXType.Move:
-                sfxSource.PlayOneShot(moveClip);
-                break;
-
-            case SFXType.Blocked:
-                sfxSource.PlayOneShot(blockedClip);
-                break;
-
-            case SFXType.Undo:
-                sfxSource.PlayOneShot(undoClip);
-                break;
-
-            case SFXType.Clear:
-                sfxSource.PlayOneShot(clearClip);
-                break;
-        }
+        sfxSource.PlayOneShot(clip);
     }
 }

@@ -8,7 +8,7 @@ public class ArrowBlock : BlockBase
 {
     [SerializeField]
     private LineRenderer lineRenderer;
-    private Coroutine clickAnimRoutine;
+    private Coroutine clickAnimaRoutine;
 
     [SerializeField]
     private Transform headVisual;
@@ -32,15 +32,14 @@ public class ArrowBlock : BlockBase
     public Direction HeadDirection;
 
     public Vector3 HeadCell => Cells[Cells.Count - 1];
+   
 
     private Coroutine moveRoutine;
 
     private bool isMoving;
 
-    private GridManager gridManager;
 
-
-    public void Init(List<Vector3> cells,Direction headDirection , GridManager gridManager, int Id)
+    public void Init(List<Vector3> cells,Direction headDirection, int Id)
     {
         if(Cells != null)
             ResetState();
@@ -48,8 +47,6 @@ public class ArrowBlock : BlockBase
         Cells = new List<Vector3>(cells);
 
         this.HeadDirection = headDirection;
-
-        this.gridManager = gridManager;
 
         this.Id = Id;
 
@@ -70,15 +67,16 @@ public class ArrowBlock : BlockBase
         if (isMoving)
             return;
 
-        if (!gridManager.CanMoveShape(this))
+
+        if (!Manager.Instance.Grid.CanMoveShape(this))
         {
-            SoundManager.Instance.Play(SFXType.Blocked);
+            Manager.Instance.Sound.Play(SFXType.Blocked);
             PlayBlockedAnimation();
             return;
         }
 
-        SoundManager.Instance.Play(SFXType.Move);
-        UndoManager.Instance.Execute(new MoveCommand(this));
+        Manager.Instance.Sound.Play(SFXType.Move);
+        Manager.Instance.Undo.Execute(new MoveCommand(this));
            
     }
 
@@ -100,13 +98,13 @@ public class ArrowBlock : BlockBase
                 HeadCell +
                 HeadDirection.ToVector();
 
-            if (gridManager.IsCompletelyOut(this))
+            if (Manager.Instance.Grid.IsCompletelyOut(this))
             {
                 ExitGrid();
                 break;
             }
 
-            if (!gridManager.CanMoveShape(this))
+            if (!Manager.Instance.Grid.CanMoveShape(this))
             {
                 break;
             }
@@ -125,7 +123,7 @@ public class ArrowBlock : BlockBase
 
         Vector3 tail = Cells[0];
 
-        GridNode tailNode = gridManager.GetNode(tail);
+        GridNode tailNode = Manager.Instance.Grid.GetNode(tail);
 
         if (tailNode != null)
         {
@@ -136,7 +134,7 @@ public class ArrowBlock : BlockBase
 
         Cells.Add(nextHead);
 
-        GridNode headNode = gridManager.GetNode(nextHead);
+        GridNode headNode = Manager.Instance.Grid.GetNode(nextHead);
 
         if (headNode != null)
         {
@@ -164,7 +162,7 @@ public class ArrowBlock : BlockBase
 
     private void UpdateHead()
     {
-        headVisual.transform.position =  gridManager.GridToWorld(HeadCell);
+        headVisual.transform.position =  Manager.Instance.Grid.GridToWorld(HeadCell);
 
         headVisual.transform.rotation =
             Quaternion.Euler(
@@ -188,7 +186,7 @@ public class ArrowBlock : BlockBase
 
     public void ExitGrid()
     {
-        gridManager.RemoveBlock(this);
+        Manager.Instance.Grid.RemoveBlock(this);
 
         gameObject.SetActive(false);
     }
@@ -199,8 +197,8 @@ public class ArrowBlock : BlockBase
     {
         transform.DOKill();
 
-        if (!StageManager.instance.ArrowBlocks.Contains(this))
-                StageManager.instance.ArrowBlocks.Add(this);
+        if (!Manager.Instance.Stage.ArrowBlocks.Contains(this))
+                Manager.Instance.Stage.ArrowBlocks.Add(this);
 
         if (moveRoutine != null)
         {
@@ -208,7 +206,7 @@ public class ArrowBlock : BlockBase
             moveRoutine = null;
         }
 
-        gridManager.UnregisterBlock(this);
+        Manager.Instance.Grid.UnregisterBlock(this);
 
         gameObject.SetActive(true);
 
@@ -216,7 +214,7 @@ public class ArrowBlock : BlockBase
 
         HeadDirection = direction;
 
-        gridManager.RegisterBlock(this);
+        Manager.Instance.Grid.RegisterBlock(this);
 
         isMoving = false;
 
@@ -244,13 +242,13 @@ public class ArrowBlock : BlockBase
     //플레이 클릭 애니메이션
     public void PlayClickAnimation()
     {
-        if (clickAnimRoutine != null)
+        if (clickAnimaRoutine != null)
         {
-            StopCoroutine(clickAnimRoutine);
+            StopCoroutine(clickAnimaRoutine);
         }
 
 
-        clickAnimRoutine = StartCoroutine(PlayLineAnimation());
+        clickAnimaRoutine = StartCoroutine(PlayLineAnimation());
 
     }
 

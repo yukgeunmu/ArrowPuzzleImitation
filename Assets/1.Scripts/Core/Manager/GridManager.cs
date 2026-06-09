@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager : MonoBehaviour
+public class GridManager
 {
     public int Width;
     public int Height;
@@ -13,10 +13,11 @@ public class GridManager : MonoBehaviour
     public event Action OnAllBlocksRemoved;
 
 
-    public void Initialize(int width, int height)
+    public void Init(int width, int height)
     {
         Width = width;
         Height = height;
+        CellSize = 1;
 
         nodes = new GridNode[width, height];
 
@@ -81,12 +82,13 @@ public class GridManager : MonoBehaviour
             node.OccupiedBlock = null;
         }
 
-        StageManager.instance.ArrowBlocks.Remove(block);
+        Manager.Instance.Stage.ArrowBlocks.Remove(block);
 
-        if (StageManager.instance.ArrowBlocks.Count <= 0)
+        if (Manager.Instance.Stage.ArrowBlocks.Count <= 0)
         {
             OnAllBlocksRemoved?.Invoke();
         }
+ 
     }
 
     public BlockBase GetBlock(Vector3 pos)

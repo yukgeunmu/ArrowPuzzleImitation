@@ -42,16 +42,13 @@ public static class SolverStateFactory
         return state;
     }
 
-    public static SolverState CreateFromStageManager(
-    StageManager stageManager)
+    public static SolverState CreateFromStageManager(StageManager stageManager)
     {
         SolverState state = new();
 
-        state.Width =
-            stageManager.GridManager.Width;
+        state.Width = Manager.Instance.Grid.Width;
 
-        state.Height =
-            stageManager.GridManager.Height;
+        state.Height = Manager.Instance.Grid.Height;
 
         foreach (var arrow in stageManager.ArrowBlocks)
         {
@@ -66,10 +63,6 @@ public static class SolverStateFactory
             state.Arrows.Add(solverArrow);
         }
 
-        foreach (var obstacle in stageManager.ObstacleBlocks)
-        {
-            state.Obstacles.Add(obstacle.GridPos);
-        }
 
         return state;
     }

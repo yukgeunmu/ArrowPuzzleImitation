@@ -1,16 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UndoManager : MonoBehaviour
+public class UndoManager
 {
-    public static UndoManager Instance;
-
     private Stack<ICommand> history = new();
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     public void Execute(ICommand command)
     {

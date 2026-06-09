@@ -12,11 +12,11 @@ public class StageButtonUI : MonoBehaviour
 
     private int stageIndex;
 
-    private StageSelectUI stageSelectUI;
+    private StageSelectPopupUI stageSelectUI;
 
     private bool unlocked;
 
-    public void Init( int index, StageSelectUI selectUI)
+    public void Init( int index, StageSelectPopupUI selectUI)
     {
         stageIndex = index;
         stageSelectUI = selectUI;

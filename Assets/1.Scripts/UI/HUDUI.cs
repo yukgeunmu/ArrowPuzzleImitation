@@ -1,9 +1,8 @@
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HUDUI : MonoBehaviour
+public class HUDUI : SceneUI
 {
     [SerializeField]
     private TMP_Text stageText;
@@ -30,6 +29,8 @@ public class HUDUI : MonoBehaviour
 
     public void Init()
     {
+        Open();
+
         undoButton.onClick.AddListener(OnUndo);
         restartButton.onClick.AddListener(OnRestart);
         resetButton.onClick.AddListener(OnReset);
@@ -45,32 +46,37 @@ public class HUDUI : MonoBehaviour
 
     private void OnUndo()
     {
-        SoundManager.Instance.Play(SFXType.Undo);
-        UndoManager.Instance.Undo();
+        OnClickAnimation();
+        Manager.Instance.Sound.Play(SFXType.Undo);
+        Manager.Instance.Undo.Undo();
     }
 
     private void OnRestart()
     {
-        SoundManager.Instance.Play(SFXType.Button);
-        StageManager.instance.RetryStage();
+        OnClickAnimation();
+        Manager.Instance.Sound.Play(SFXType.Button);
+        Manager.Instance.Stage.RetryStage();
     }
 
     private void OnReset()
     {
-        SoundManager.Instance.Play(SFXType.Button);
-        StageManager.instance.ResetProgress();
+        OnClickAnimation();
+        Manager.Instance.Sound.Play(SFXType.Button);
+        Manager.Instance.Stage.ResetProgress();
     }
 
 
     private void OpenStageSelect()
     {
-        SoundManager.Instance.Play(SFXType.Button);
-        StageManager.instance.ShowStageSelect();
+        OnClickAnimation();
+        Manager.Instance.Sound.Play(SFXType.Button);
+        _ = Manager.Instance.UI.ShowPopup<StageSelectPopupUI>();
     }
 
     private void OnHint()
     {
-        HintManager.instance.ShowHint();
+        OnClickAnimation();
+        Manager.Instance.Hint.ShowHint();
     }
 
 
