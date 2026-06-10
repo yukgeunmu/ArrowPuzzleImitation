@@ -24,6 +24,9 @@ public class ArrowBlock : BlockBase
     [Header("애니메이션 속도")]
     [SerializeField] private float shrinkDuration = 0.3f; // 원래대로 돌아오는 데 걸리는 시간
 
+    [Header("화살이동 속도")]
+    [SerializeField] private float moveVelocity = 0.05f;
+
 
     public int Id;
 
@@ -111,7 +114,7 @@ public class ArrowBlock : BlockBase
 
             MoveOneStep();
 
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(moveVelocity);
         }
 
         isMoving = false;

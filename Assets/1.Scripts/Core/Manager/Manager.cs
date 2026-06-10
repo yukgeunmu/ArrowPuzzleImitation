@@ -39,12 +39,13 @@ public class Manager : MonoBehaviour
 
         await Resource.LoadDataAsync<StageDataSO>("Stage");
         await Resource.LoadDataAsync<AudioClip>("Sound");
+        await Resource.LoadDataAsync<GameObject>("UI");
         await Resource.LoadAsync<GameObject>("Arrow");
 
-        UI.Init();
         Sound.Init();
+        UI.Init();
 
-        await UI.SetSceneUI<HUDUI>();
+        UI.SetSceneUI<HUDUI>();
 
         Stage.Init();
 

@@ -38,13 +38,13 @@ public class ClearPopupUI : PopupUI
 
     public void OnClickNextButton()
     {
-        OnClickAnimation();
+        OnClickAnimation(nextButton);
         Manager.Instance.Stage.NextStage();
     }
 
     public void OnClickRetryButton()
     {
-        OnClickAnimation();
+        OnClickAnimation(retryButton);
         Manager.Instance.Stage.RetryStage();
     }
 }

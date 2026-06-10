@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class BaseUI : MonoBehaviour
 {
@@ -13,9 +14,9 @@ public abstract class BaseUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void OnClickAnimation()
+    public void OnClickAnimation(Button button)
     {
-        transform.DOPunchScale(
+        button.transform.DOPunchScale(
             Vector3.one * 0.15f,
             0.15f);
     }

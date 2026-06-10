@@ -46,21 +46,21 @@ public class HUDUI : SceneUI
 
     private void OnUndo()
     {
-        OnClickAnimation();
+        OnClickAnimation(undoButton);
         Manager.Instance.Sound.Play(SFXType.Undo);
         Manager.Instance.Undo.Undo();
     }
 
     private void OnRestart()
     {
-        OnClickAnimation();
+        OnClickAnimation(restartButton);
         Manager.Instance.Sound.Play(SFXType.Button);
         Manager.Instance.Stage.RetryStage();
     }
 
     private void OnReset()
     {
-        OnClickAnimation();
+        OnClickAnimation(resetButton);
         Manager.Instance.Sound.Play(SFXType.Button);
         Manager.Instance.Stage.ResetProgress();
     }
@@ -68,14 +68,14 @@ public class HUDUI : SceneUI
 
     private void OpenStageSelect()
     {
-        OnClickAnimation();
+        OnClickAnimation(stageSelectButton);
         Manager.Instance.Sound.Play(SFXType.Button);
-        _ = Manager.Instance.UI.ShowPopup<StageSelectPopupUI>();
+        Manager.Instance.UI.ShowPopup<StageSelectPopupUI>();
     }
 
     private void OnHint()
     {
-        OnClickAnimation();
+        OnClickAnimation(hintButton);
         Manager.Instance.Hint.ShowHint();
     }
 

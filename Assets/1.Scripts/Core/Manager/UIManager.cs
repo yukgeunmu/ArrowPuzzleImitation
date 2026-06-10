@@ -18,6 +18,8 @@ public class UIManager
     {
         BindRoots();
 
+        Manager.Instance.Grid.OnAllBlocksRemoved += HandleStageClear;
+
     }
 
     private void BindRoots()
@@ -72,33 +74,38 @@ public class UIManager
         return canvasObject;
     }
 
-    public async Task SetSceneUI<T>() where T : SceneUI
+    public void SetSceneUI<T>() where T : SceneUI
     {
         string key = typeof(T).Name;
 
-        GameObject prefab = await Manager.Instance.Resource.LoadAsync<GameObject>(key);
+        GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI",key);
 
         GameObject instance = Object.Instantiate(prefab, sceneRoot);
 
         currentSceneUI = instance.GetComponent<SceneUI>();
     }
 
-    public async Task<T> ShowPopup<T>() where T : PopupUI
+    public void ShowPopup<T>() where T : PopupUI
     {
         string key = typeof(T).Name;
 
-        GameObject prefab = await Manager.Instance.Resource.LoadAsync<GameObject>(key);
+        T popup = Manager.Instance.Pool.GetPopupUI<T>(key);
 
-        T popup = Object.Instantiate(prefab, popupRoot).GetComponent<T>();
+        if (popup == null)
+        {
+            GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", key);
+
+            popup = Object.Instantiate(prefab, popupRoot).GetComponent<T>();
+
+            popup.transform.SetParent(popupRoot, false);
+        }
 
         popup.Open();
 
         popupStack.Push(popup);
-
-        return popup;
     }
 
-    public void ClosePopup()
+    public void ClosePopup<T>()
     {
         if (popupStack.Count <= 0)
             return;
@@ -106,14 +113,19 @@ public class UIManager
         PopupUI popup = popupStack.Pop();
 
         popup.Close();
+
+        Manager.Instance.Pool.PushPopupUI<T>(popup);
     }
 
 
     public T GetScene<T>() where T : SceneUI
     {
-        if (currentSceneUI == null)
-            Debug.Log("11111111");
-
         return currentSceneUI as T;
+    }
+
+    private void HandleStageClear()
+    {
+        ShowPopup<ClearPopupUI>();
+        Manager.Instance.Sound.Play(SFXType.Clear);
     }
 }

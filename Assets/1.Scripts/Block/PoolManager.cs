@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class PoolManager
 {
     private readonly List<ArrowBlock> pool = new();
+    private readonly Dictionary<string, PopupUI> popUIPool = new();
 
     public ArrowBlock Get()
     {
@@ -19,11 +19,30 @@ public class PoolManager
 
         GameObject prefab = Manager.Instance.Resource.GetAsset<GameObject>("Arrow");
 
-        ArrowBlock newArrow =  Object.Instantiate(prefab).GetComponent<ArrowBlock>();
+        ArrowBlock newArrow = Object.Instantiate(prefab).GetComponent<ArrowBlock>();
 
         pool.Add(newArrow);
 
         return newArrow;
     }
+
+    public T GetPopupUI<T>(string key) where T : PopupUI
+    {
+        if(popUIPool.TryGetValue(key, out PopupUI popup))
+        {
+            return popup as T;
+        }
+
+        return null;
+    }
+
+    public void PushPopupUI<T>(PopupUI popupUI)
+    {
+        string key = typeof(T).Name;
+
+        popUIPool[key] = popupUI;
+    }
+
+
 
 }

@@ -145,6 +145,7 @@ MonoBehaviour:
   normalWidth: 0.25
   targetWidth: 0.4
   shrinkDuration: 0.3
+  moveVelocity: 0.03
   Id: 2
   HeadDirection: 0
 --- !u!68 &3082668178961301491

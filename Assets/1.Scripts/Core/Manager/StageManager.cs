@@ -18,8 +18,6 @@ public class StageManager
         currentStageIndex = SaveManager.CurrentStage;
 
         LoadStage();
-
-        Manager.Instance.Grid.OnAllBlocksRemoved += HandleStageClear;
     }
 
     private void LoadStage()
@@ -59,15 +57,9 @@ public class StageManager
 
     }
 
-    private void HandleStageClear()
-    {
-        _ = Manager.Instance.UI.ShowPopup<ClearPopupUI>();
-        Manager.Instance.Sound.Play(SFXType.Clear);
-    }
-
     public void NextStage()
     {
-        Manager.Instance.UI.ClosePopup();
+        Manager.Instance.UI.ClosePopup<ClearPopupUI>();
 
         currentStageIndex++;
 
@@ -105,7 +97,7 @@ public class StageManager
 
     public void RetryStage()
     {
-        Manager.Instance.UI.ClosePopup();
+        Manager.Instance.UI.ClosePopup<ClearPopupUI>();
 
         ClearCurrentStage();
 

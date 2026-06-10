@@ -1,14 +1,18 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StageSelectPopupUI : PopupUI
 {
     [SerializeField]
     private Transform content;
 
+    //[SerializeField]
+    //private StageButtonUI stageButtonPrefab;
+
     [SerializeField]
-    private StageButtonUI stageButtonPrefab;
+    private Button closeButton;
 
     private List<StageButtonUI> buttons;
 
@@ -28,14 +32,17 @@ public class StageSelectPopupUI : PopupUI
 
         for (int i = 0; i < Manager.Instance.Stage.StageLength; i++)
         {
-            StageButtonUI button =
-                Instantiate(
-                    stageButtonPrefab,
-                    content);
+            GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", typeof(StageButtonUI).Name);
+
+            StageButtonUI button = prefab.GetComponent<StageButtonUI>();
 
             button.Init(i, this);
             buttons.Add(button);
+
+            Instantiate(button, content);
         }
+
+        closeButton.onClick.AddListener(OnClickCloseButton);
     }
 
     public override void Open()
@@ -44,11 +51,6 @@ public class StageSelectPopupUI : PopupUI
         UnlockStage();
     }
 
-    public override void Close()
-    {
-        base.Close();
-
-    }
 
     public void SelectStage(int stageIndex)
     {
@@ -64,5 +66,10 @@ public class StageSelectPopupUI : PopupUI
         {
             button.Unlock();
         }
+    }
+
+    public void OnClickCloseButton()
+    {
+        Manager.Instance.UI.ClosePopup<StageSelectPopupUI>();
     }
 }
