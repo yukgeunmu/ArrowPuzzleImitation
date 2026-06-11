@@ -1,38 +1,38 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+public class InputManager
 {
     private Camera mainCam;
 
     private PlayerInputActions inputActions;
 
-    private void Awake()
+    public void Init()
     {
         inputActions = new PlayerInputActions();
+        mainCam = Camera.main;
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
         inputActions.Enable();
 
         inputActions.Player.Click.performed += OnClick;
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         inputActions.Player.Click.performed -= OnClick;
 
         inputActions.Disable();
     }
 
-    private void Start()
-    {
-        mainCam = Camera.main;
-    }
 
     private void OnClick(InputAction.CallbackContext ctx)
     {
+        if (Manager.Instance.UI.HasPopup)
+            return;
+
         Vector2 mousePos =  inputActions.Player.Position.ReadValue<Vector2>();
 
         Vector2 worldPos = mainCam.ScreenToWorldPoint(mousePos);

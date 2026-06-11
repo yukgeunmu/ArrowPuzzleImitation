@@ -22,6 +22,7 @@ public class HUDUI : SceneUI
     [SerializeField]
     private Button hintButton;
 
+
     private void Awake()
     {
         Init();
@@ -76,6 +77,7 @@ public class HUDUI : SceneUI
     private void OnHint()
     {
         OnClickAnimation(hintButton);
+        Manager.Instance.Sound.Play(SFXType.Button);
         Manager.Instance.Hint.ShowHint();
     }
 

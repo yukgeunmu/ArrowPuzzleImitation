@@ -8,11 +8,11 @@ public class StageSelectPopupUI : PopupUI
     [SerializeField]
     private Transform content;
 
-    //[SerializeField]
-    //private StageButtonUI stageButtonPrefab;
-
     [SerializeField]
     private Button closeButton;
+
+    [SerializeField]
+    private Button bgCloseButton;
 
     private List<StageButtonUI> buttons;
 
@@ -43,6 +43,7 @@ public class StageSelectPopupUI : PopupUI
         }
 
         closeButton.onClick.AddListener(OnClickCloseButton);
+        bgCloseButton.onClick.AddListener(OnClickCloseButton);
     }
 
     public override void Open()
@@ -55,7 +56,7 @@ public class StageSelectPopupUI : PopupUI
     public void SelectStage(int stageIndex)
     {
         Close();
-
+        Debug.Log("gma..");
         Manager.Instance.Stage.LoadStage(stageIndex);
     }
 

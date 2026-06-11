@@ -11,7 +11,10 @@ public class ArrowBlock : BlockBase
     private Coroutine clickAnimaRoutine;
 
     [SerializeField]
-    private Transform headVisual;
+    private GameObject headVisual;
+
+    [SerializeField]
+    private SpriteRenderer headVisualSprite;
 
     [SerializeField]
     private EdgeCollider2D edgeCollider;
@@ -26,6 +29,10 @@ public class ArrowBlock : BlockBase
 
     [Header("화살이동 속도")]
     [SerializeField] private float moveVelocity = 0.05f;
+
+
+    private Coroutine hintCoroutine;
+    private Color originColor;
 
 
     public int Id;
@@ -59,6 +66,7 @@ public class ArrowBlock : BlockBase
         this.lineRenderer.endColor = Color.black;
         this.headVisual.transform.localScale = Vector3.one;
 
+        originColor = Color.black;
         RefreshVisual();
     }
 
@@ -159,8 +167,12 @@ public class ArrowBlock : BlockBase
         }
 
         edgeCollider.SetPoints(edgePoints);
-        
+      
         UpdateHead();
+
+        hintCoroutine = null;
+        ResetColor();
+        RestScale();
     }
 
     private void UpdateHead()
@@ -280,37 +292,42 @@ public class ArrowBlock : BlockBase
             yield return null; // 다음 프레임까지 대기
         }
 
-        // 3. 완벽하게 원래 두께로 고정
         lineRenderer.startWidth = normalWidth;
         lineRenderer.endWidth = normalWidth;
-
     }
 
     public void PlayHint()
     {
-        StartCoroutine(HintRoutine());
+        if (hintCoroutine != null)
+            return;
+        
+
+
+            hintCoroutine = StartCoroutine(HintRoutine());
     }
 
     private IEnumerator HintRoutine()
     {
-        Color origin = lineRenderer.startColor;
-
         for (int i = 0; i < 3; i++)
         {
-            lineRenderer.startColor = Color.yellow;
+            lineRenderer.startColor = Color.skyBlue;
 
-            lineRenderer.endColor = Color.yellow;
+            lineRenderer.endColor = Color.skyBlue;
 
-            yield return
-                new WaitForSeconds(
-                    0.2f);
+            headVisualSprite.color = Color.skyBlue;
 
-            lineRenderer.startColor = origin;
+            yield return new WaitForSeconds(0.2f);
 
-            lineRenderer.endColor = origin;
+            lineRenderer.startColor = originColor;
+
+            lineRenderer.endColor = originColor;
+
+            headVisualSprite.color = originColor;
 
             yield return new WaitForSeconds(0.2f);
         }
+
+        hintCoroutine = null;
     }
 
     public void ResetState()
@@ -320,5 +337,19 @@ public class ArrowBlock : BlockBase
         Cells.Clear();
 
         isMoving = false;
+    }
+
+    private void ResetColor()
+    {
+        lineRenderer.startColor = originColor;
+        lineRenderer.endColor = originColor;
+        headVisualSprite.color = originColor;
+    }
+
+    private void RestScale()
+    {
+        lineRenderer.startWidth = normalWidth;
+        lineRenderer.endWidth = normalWidth;
+        headVisual.transform.localScale = Vector3.one;
     }
 }

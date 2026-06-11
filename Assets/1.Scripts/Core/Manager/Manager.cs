@@ -16,6 +16,8 @@ public class Manager : MonoBehaviour
 
     public readonly UIManager UI = new UIManager();
 
+    public readonly InputManager Input = new InputManager();
+
     public readonly UndoManager Undo = new UndoManager();
 
     public readonly HintManager Hint = new HintManager();
@@ -23,7 +25,7 @@ public class Manager : MonoBehaviour
     public readonly PoolManager Pool = new PoolManager();
 
 
-    private async void Awake()
+    private void Awake()
     {
         if (Instance != null)
         {
@@ -37,6 +39,12 @@ public class Manager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
+        Input.Init();
+
+    }
+
+    private async void Start()
+    {
         await Resource.LoadDataAsync<StageDataSO>("Stage");
         await Resource.LoadDataAsync<AudioClip>("Sound");
         await Resource.LoadDataAsync<GameObject>("UI");
@@ -48,7 +56,16 @@ public class Manager : MonoBehaviour
         UI.SetSceneUI<HUDUI>();
 
         Stage.Init();
+    }
 
+    private void OnEnable()
+    {
+        Input.OnEnable();
+    }
+
+    private void OnDisable()
+    {
+        Input.OnDisable();
     }
 
 

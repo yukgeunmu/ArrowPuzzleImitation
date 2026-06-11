@@ -41,6 +41,8 @@ public class StageEditorWindow : EditorWindow
         {
             SaveStage();
         }
+
+
     }
 
     private void DrawHeader()

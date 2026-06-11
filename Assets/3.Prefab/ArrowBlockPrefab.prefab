@@ -81,8 +81,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1486736674410596525, guid: 80d8668f8cbb32f49a413598ae0cee1a, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: -1186779820612649967, guid: 067dab69f0771e74ca0a143013514981, type: 3}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -140,7 +140,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowBlock
   GridPos: {x: 0, y: 0, z: 0}
   lineRenderer: {fileID: 6126441061831739851}
-  headVisual: {fileID: 3516734706872669318}
+  headVisual: {fileID: 1629056961378721111}
+  headVisualSprite: {fileID: 7792839490748770332}
   edgeCollider: {fileID: 3082668178961301491}
   normalWidth: 0.25
   targetWidth: 0.4

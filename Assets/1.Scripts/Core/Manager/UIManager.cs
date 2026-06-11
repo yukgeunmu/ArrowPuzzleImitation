@@ -14,6 +14,8 @@ public class UIManager
 
     private Transform popupRoot;
 
+    public bool HasPopup => popupStack.Count > 0;
+
     public void Init()
     {
         BindRoots();
