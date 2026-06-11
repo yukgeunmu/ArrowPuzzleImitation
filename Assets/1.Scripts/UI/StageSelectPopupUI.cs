@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,6 +20,7 @@ public class StageSelectPopupUI : PopupUI
         Init();
     }
 
+
     public void Init()
     {
         buttons = new List<StageButtonUI>();
@@ -34,12 +34,10 @@ public class StageSelectPopupUI : PopupUI
         {
             GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", typeof(StageButtonUI).Name);
 
-            StageButtonUI button = prefab.GetComponent<StageButtonUI>();
+            StageButtonUI button = Instantiate(prefab, content).GetComponent<StageButtonUI>();
 
             button.Init(i, this);
             buttons.Add(button);
-
-            Instantiate(button, content);
         }
 
         closeButton.onClick.AddListener(OnClickCloseButton);
@@ -55,8 +53,7 @@ public class StageSelectPopupUI : PopupUI
 
     public void SelectStage(int stageIndex)
     {
-        Close();
-        Debug.Log("gma..");
+        OnClickCloseButton();
         Manager.Instance.Stage.LoadStage(stageIndex);
     }
 

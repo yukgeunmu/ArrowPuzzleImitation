@@ -30,6 +30,7 @@ public class InputManager
 
     private void OnClick(InputAction.CallbackContext ctx)
     {
+
         if (Manager.Instance.UI.HasPopup)
             return;
 
@@ -41,6 +42,7 @@ public class InputManager
 
         if (hit.collider == null)
             return;
+
 
         if (hit.collider.TryGetComponent<ArrowBlock>(out ArrowBlock arrow))
         {

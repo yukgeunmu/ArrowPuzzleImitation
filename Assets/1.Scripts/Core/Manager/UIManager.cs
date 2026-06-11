@@ -113,6 +113,7 @@ public class UIManager
             return;
 
         PopupUI popup = popupStack.Pop();
+        Debug.Log(popup + "13");
 
         popup.Close();
 

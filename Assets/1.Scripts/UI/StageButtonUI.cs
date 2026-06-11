@@ -28,9 +28,8 @@ public class StageButtonUI : MonoBehaviour
 
     }
 
-    private void OnClick()
+    public void OnClick()
     {
-        Debug.Log("버튼클릭!");
         stageSelectUI.SelectStage(stageIndex);
     }
 
