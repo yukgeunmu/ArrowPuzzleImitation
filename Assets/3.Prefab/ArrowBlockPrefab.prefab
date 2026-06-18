@@ -184,7 +184,7 @@ EdgeCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.2
+  m_EdgeRadius: 0.5
   m_Points:
   - {x: 3, y: 0}
   - {x: 3, y: 1}
@@ -320,7 +320,7 @@ LineRenderer:
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 63387
+      ctime1: 65535
       ctime2: 0
       ctime3: 0
       ctime4: 0

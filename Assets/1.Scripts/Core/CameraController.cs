@@ -21,9 +21,17 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float dragSpeed = 0.01f;
 
+    [SerializeField]
+    private float dragThreshold = 10f;
+
+    private Vector2 touchStartPos;
+    private bool isTouchDragging;
+
     private float defaultZoom;
 
     private Vector2 lastPointerPosition;
+
+    public bool IsDragging => isTouchDragging;
 
     private bool isDragging;
 
@@ -53,6 +61,7 @@ public class CameraController : MonoBehaviour
 
     public void FitToGrid(int width, int height)
     {
+
         float aspect = (float)Screen.width / Screen.height;
 
         float verticalSize = height * 0.5f + padding;
@@ -71,6 +80,8 @@ public class CameraController : MonoBehaviour
 
         minY = -height * 0.5f;
         maxY = height * 0.5f;
+
+        targetCamera.transform.position = new Vector3( 0f, 0f, targetCamera.transform.position.z);
     }
 
     private void HandleMouseZoom()
@@ -211,27 +222,36 @@ public class CameraController : MonoBehaviour
         if (Touchscreen.current == null)
             return;
 
-        var touches = Touchscreen.current.touches;
+        var touch = Touchscreen.current.primaryTouch;
 
-        if (touches.Count == 0)
+        if (!touch.press.isPressed)
             return;
 
-        // 핀치 중이면 이동 금지
-        if (touches.Count >= 2 &&
-            touches[0].isInProgress &&
-            touches[1].isInProgress)
+        // 터치 시작
+        if (touch.press.wasPressedThisFrame)
         {
+            touchStartPos = touch.position.ReadValue();
+            isTouchDragging = false;
             return;
         }
 
-        var touch = touches[0];
+        Vector2 currentPos =
+            touch.position.ReadValue();
 
-        if (!touch.isInProgress)
+        float distance =
+            Vector2.Distance(
+                touchStartPos,
+                currentPos);
+
+        if (distance > dragThreshold)
+        {
+            isTouchDragging = true;
+        }
+
+        if (!isTouchDragging)
             return;
 
-        Vector2 delta =
-            touch.delta.ReadValue();
-
-        MoveCamera(delta);
+        MoveCamera(
+            touch.delta.ReadValue());
     }
 }

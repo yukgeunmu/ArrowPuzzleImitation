@@ -10,4 +10,6 @@ public class BlockInfo
     public Direction HeadDirection;
 
     public Vector3 Position;
+
+    public Color Color = Color.black;
 }

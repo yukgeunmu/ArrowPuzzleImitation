@@ -1,7 +1,6 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 public class ArrowBlock : BlockBase
@@ -42,16 +41,16 @@ public class ArrowBlock : BlockBase
     public Direction HeadDirection;
 
     public Vector3 HeadCell => Cells[Cells.Count - 1];
-   
+
 
     private Coroutine moveRoutine;
 
     private bool isMoving;
 
 
-    public void Init(List<Vector3> cells,Direction headDirection, int Id)
+    public void Init(List<Vector3> cells, Direction headDirection, int Id, Color color)
     {
-        if(Cells != null)
+        if (Cells != null)
             ResetState();
 
         Cells = new List<Vector3>(cells);
@@ -62,11 +61,11 @@ public class ArrowBlock : BlockBase
 
         this.lineRenderer.startWidth = normalWidth;
         this.lineRenderer.endWidth = normalWidth;
-        this.lineRenderer.startColor = Color.black;
-        this.lineRenderer.endColor = Color.black;
+        this.lineRenderer.startColor = color;
+        this.lineRenderer.endColor = color;
         this.headVisual.transform.localScale = Vector3.one;
 
-        originColor = Color.black;
+        originColor = color;
         RefreshVisual();
     }
 
@@ -88,7 +87,7 @@ public class ArrowBlock : BlockBase
 
         Manager.Instance.Sound.Play(SFXType.Move);
         Manager.Instance.Undo.Execute(new MoveCommand(this));
-           
+
     }
 
     public void StartMove()
@@ -96,7 +95,7 @@ public class ArrowBlock : BlockBase
         if (isMoving)
             return;
 
-       moveRoutine = StartCoroutine(MoveRoutine());
+        moveRoutine = StartCoroutine(MoveRoutine());
     }
 
     private IEnumerator MoveRoutine()
@@ -105,9 +104,7 @@ public class ArrowBlock : BlockBase
 
         while (true)
         {
-            Vector3 nextPos =
-                HeadCell +
-                HeadDirection.ToVector();
+            Vector3 nextPos = HeadCell + HeadDirection.ToVector();
 
             if (Manager.Instance.Grid.IsCompletelyOut(this))
             {
@@ -162,12 +159,12 @@ public class ArrowBlock : BlockBase
 
         for (int i = 0; i < Cells.Count; i++)
         {
-            lineRenderer.SetPosition( i, Cells[i]);
+            lineRenderer.SetPosition(i, Cells[i]);
             edgePoints.Add(Cells[i]);
         }
 
         edgeCollider.SetPoints(edgePoints);
-      
+
         UpdateHead();
 
         hintCoroutine = null;
@@ -177,7 +174,7 @@ public class ArrowBlock : BlockBase
 
     private void UpdateHead()
     {
-        headVisual.transform.position =  Manager.Instance.Grid.GridToWorld(HeadCell);
+        headVisual.transform.position = Manager.Instance.Grid.GridToWorld(HeadCell);
 
         headVisual.transform.rotation =
             Quaternion.Euler(
@@ -213,7 +210,7 @@ public class ArrowBlock : BlockBase
         transform.DOKill();
 
         if (!Manager.Instance.Stage.ArrowBlocks.Contains(this))
-                Manager.Instance.Stage.ArrowBlocks.Add(this);
+            Manager.Instance.Stage.ArrowBlocks.Add(this);
 
         if (moveRoutine != null)
         {
@@ -300,10 +297,10 @@ public class ArrowBlock : BlockBase
     {
         if (hintCoroutine != null)
             return;
-        
 
 
-            hintCoroutine = StartCoroutine(HintRoutine());
+
+        hintCoroutine = StartCoroutine(HintRoutine());
     }
 
     private IEnumerator HintRoutine()

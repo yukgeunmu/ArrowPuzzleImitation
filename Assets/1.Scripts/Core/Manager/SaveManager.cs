@@ -1,22 +1,34 @@
 using UnityEngine;
 
-public static class SaveManager
+public class SaveManager
 {
-    private const string CurrentStageKey = "CurrentStage";
-
-    public static int CurrentStage
+    public void SaveBestRecord(Difficulty difficulty, float clearTime)
     {
-        get => PlayerPrefs.GetInt(CurrentStageKey, 0);
+        string key = $"BEST_TIME_{difficulty}";
 
-        set
+        float bestTime =  PlayerPrefs.GetFloat( key, float.MaxValue);
+
+        if (clearTime < bestTime)
         {
-            PlayerPrefs.SetInt(CurrentStageKey, value);
+            PlayerPrefs.SetFloat(key, clearTime);
+
             PlayerPrefs.Save();
         }
     }
 
-    public static void Clear()
+    public float GetBestRecord(Difficulty difficulty)
     {
-        PlayerPrefs.DeleteKey(CurrentStageKey);
+        string key = $"BEST_TIME_{difficulty}";
+
+        return PlayerPrefs.GetFloat(key, -1f);
     }
+}
+
+public enum Difficulty
+{
+    Easy,
+    Normal,
+    Hard,
+    Expert,
+    Master
 }

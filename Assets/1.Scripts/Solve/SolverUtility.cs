@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class SolverUtility
@@ -27,16 +28,11 @@ public static class SolverUtility
 
     public static bool CanMoveArrow( SolverState state, SolverArrow arrow)
     {
-        Vector3 nextHead =
-            arrow.HeadCell +
-            arrow.HeadDirection.ToVector();
+        Vector3 nextHead =  arrow.HeadCell +  arrow.HeadDirection.ToVector();
 
         // 밖이면 탈출 가능
         if (IsOutOfGrid(state, nextHead))
             return true;
-
-        if (state.Obstacles.Contains(nextHead))
-            return false;
 
         foreach (var otherArrow in state.Arrows)
         {
@@ -95,9 +91,7 @@ public static class SolverUtility
 
     private static void MoveOneStep(SolverState state, SolverArrow arrow)
     {
-        Vector3 nextHead =
-            arrow.HeadCell +
-            arrow.HeadDirection.ToVector();
+        Vector3 nextHead = arrow.HeadCell + arrow.HeadDirection.ToVector();
 
         arrow.Cells.RemoveAt(0);
 
@@ -114,4 +108,36 @@ public static class SolverUtility
 
         return true;
     }
+
+    public static bool CanExitArrow( SolverState state, int arrowIndex)
+    {
+        SolverState nextState = MoveArrow(state, arrowIndex);
+
+        return nextState.Arrows.Count < state.Arrows.Count;
+    }
+
+    public static bool CanExit(SolverState state, SolverArrow arrow)
+    {
+        Vector3 dir = arrow.HeadDirection.ToVector();
+
+        Vector3 pos = arrow.HeadCell + dir;
+
+        while (!IsOutOfGrid(state, pos))
+        {
+            foreach (var other in state.Arrows)
+            {
+                if (other == arrow)
+                    continue;
+
+                if (other.Cells.Contains(pos))
+                    return false;
+            }
+
+            pos += dir;
+        }
+
+        return true;
+    }
+
+
 }

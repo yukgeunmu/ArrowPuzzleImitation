@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 public class UIManager
@@ -76,18 +74,20 @@ public class UIManager
         return canvasObject;
     }
 
-    public void SetSceneUI<T>() where T : SceneUI
+    private void SetSceneUI<T>() where T : SceneUI
     {
         string key = typeof(T).Name;
 
-        GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI",key);
+        GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", key);
 
         GameObject instance = Object.Instantiate(prefab, sceneRoot);
 
         currentSceneUI = instance.GetComponent<SceneUI>();
+
+        Manager.Instance.Pool.PushSceneUI<T>(currentSceneUI);
     }
 
-    public void ShowPopup<T>() where T : PopupUI
+    public T ShowPopup<T>() where T : PopupUI
     {
         string key = typeof(T).Name;
 
@@ -105,6 +105,8 @@ public class UIManager
         popup.Open();
 
         popupStack.Push(popup);
+
+        return popup as T;
     }
 
     public void ClosePopup<T>()
@@ -113,7 +115,6 @@ public class UIManager
             return;
 
         PopupUI popup = popupStack.Pop();
-        Debug.Log(popup + "13");
 
         popup.Close();
 
@@ -128,7 +129,40 @@ public class UIManager
 
     private void HandleStageClear()
     {
-        ShowPopup<ClearPopupUI>();
         Manager.Instance.Sound.Play(SFXType.Clear);
+        ClearPopupUI popupUI = ShowPopup<ClearPopupUI>();
+        Manager.Instance.OnClear(popupUI);
+    }
+
+    public void ChangeScene<T>() where T : SceneUI
+    {
+        if (currentSceneUI != null)
+        {
+            currentSceneUI.gameObject.SetActive(false);
+        }
+
+        T sceneUI = Manager.Instance.Pool.GetSceneUI<T>();
+
+        if (sceneUI != null)
+        {
+            currentSceneUI = sceneUI;
+            currentSceneUI.gameObject.SetActive(true);
+            return;
+        }
+
+        SetSceneUI<T>();
+
+    }
+
+    public string FormatTime(float time)
+    {
+        int minutes = Mathf.FloorToInt(time / 60);
+
+        int seconds = Mathf.FloorToInt(time % 60);
+
+        int milliseconds =
+            Mathf.FloorToInt((time * 100) % 100);
+
+        return $"{minutes:00}:{seconds:00}.{milliseconds:00}";
     }
 }

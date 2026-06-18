@@ -1,22 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class StageManager
 {
-    private int currentStageIndex;
 
-    public int StageLength;
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+    public int MaxLen { get; private set; }
+    public Difficulty Difficulty { get; private set; }
 
     public List<ArrowBlock> ArrowBlocks = new();
 
     public event Action<int, int> OnStageLoaded;
 
-    public void Init()
-    {
-        currentStageIndex = SaveManager.CurrentStage;
+    private StageData stage = new StageData();
 
+    public void Init(int width, int height, int maxLen, Difficulty difficulty)
+    {
+        SetPuzzleSize(width, height, maxLen, difficulty);
         LoadStage();
     }
 
@@ -24,11 +26,7 @@ public class StageManager
     {
         int nextArrowId = 0;
 
-        StageLength = Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count;
-
-        StageDataSO stage = Manager.Instance.Resource.GetData<StageDataSO>("Stage", $"Stage{currentStageIndex + 1}");
-
-        Manager.Instance.UI.GetScene<HUDUI>().SetStage(currentStageIndex + 1);
+        stage = GenerateStage();
 
         Manager.Instance.Grid.Init(stage.Width, stage.Height);
 
@@ -42,7 +40,7 @@ public class StageManager
 
                     arrow.transform.SetPositionAndRotation(Manager.Instance.Grid.GridToWorld(info.Position), Quaternion.identity);
 
-                    arrow.Init(info.Cells, info.HeadDirection , nextArrowId++);
+                    arrow.Init(info.Cells, info.HeadDirection, nextArrowId++, info.Color);
 
                     ArrowBlocks.Add(arrow);
 
@@ -61,20 +59,9 @@ public class StageManager
     {
         Manager.Instance.UI.ClosePopup<ClearPopupUI>();
 
-        currentStageIndex++;
-
-        SaveManager.CurrentStage = currentStageIndex;
-
-        if (currentStageIndex >= Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count)
-        {
-            currentStageIndex = Manager.Instance.Resource.GetTableData<StageDataSO>("Stage").Count - 1;
-
-            Debug.Log("All Clear");
-
-            return;
-        }
-
         ClearCurrentStage();
+
+        Manager.Instance.SetTime(true);
 
         LoadStage();
     }
@@ -95,23 +82,12 @@ public class StageManager
         Manager.Instance.Undo.Clear();
     }
 
-    public void RetryStage()
-    {
-        Manager.Instance.UI.ClosePopup<ClearPopupUI>();
 
+    public void BackLevelSelectStage()
+    {
+        Manager.Instance.isPlaying = false;
+        Manager.Instance.UI.ChangeScene<LevelSelectUI>();
         ClearCurrentStage();
-
-        LoadStage();
-    }
-
-
-    public void ResetProgress()
-    {
-        SaveManager.Clear();
-
-        currentStageIndex = 0;
-
-        RetryStage();
     }
 
 
@@ -119,16 +95,62 @@ public class StageManager
     {
         Manager.Instance.Undo.Clear();
 
-        currentStageIndex = stageIndex;
-
         ClearCurrentStage();
 
         LoadStage();
     }
 
 
-    public ArrowBlock GetArrowById( int id)
+    public ArrowBlock GetArrowById(int id)
     {
-        return ArrowBlocks.Find( x => x.Id == id);
+        return ArrowBlocks.Find(x => x.Id == id);
     }
+
+
+    private StageData GenerateStage()
+    {
+        StageData stage = new StageData();
+        List<ArrowData> arrows = new List<ArrowData>();
+        AutoGeneratorReverse autoGeneratorReverse = new AutoGeneratorReverse();
+
+        arrows = autoGeneratorReverse.Generate(Width, Height, 2, MaxLen);
+
+        stage.Width = Width;
+        stage.Height = Height;
+
+        stage.Blocks = new();
+
+        foreach (var arrow in arrows)
+        {
+            BlockInfo data = new();
+
+            data.Type = BlockType.Arrow;
+
+            data.HeadDirection = arrow.HeadDirection;
+
+            data.Cells = new();
+
+            data.Position = Vector3.zero;
+
+            foreach (var cell in arrow.Cells)
+            {
+                data.Cells.Add(new Vector3(cell.x, cell.y));
+            }
+
+            data.Color = arrow.Color;
+
+            stage.Blocks.Add(data);
+        }
+
+        return stage;
+    }
+
+    public void SetPuzzleSize(int width, int height, int maxLen, Difficulty difficulty)
+    {
+        Width = width;
+        Height = height;
+        MaxLen = maxLen;
+        Difficulty = difficulty;
+    }
+
 }

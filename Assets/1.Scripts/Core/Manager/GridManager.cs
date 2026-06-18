@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GridManager
@@ -88,7 +87,7 @@ public class GridManager
         {
             OnAllBlocksRemoved?.Invoke();
         }
- 
+
     }
 
     public BlockBase GetBlock(Vector3 pos)

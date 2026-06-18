@@ -30,15 +30,15 @@ public class StageSelectPopupUI : PopupUI
             Destroy(child.gameObject);
         }
 
-        for (int i = 0; i < Manager.Instance.Stage.StageLength; i++)
-        {
-            GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", typeof(StageButtonUI).Name);
+        //for (int i = 0; i < Manager.Instance.Stage.StageLength; i++)
+        //{
+        //    GameObject prefab = Manager.Instance.Resource.GetData<GameObject>("UI", typeof(StageButtonUI).Name);
 
-            StageButtonUI button = Instantiate(prefab, content).GetComponent<StageButtonUI>();
+        //    StageButtonUI button = Instantiate(prefab, content).GetComponent<StageButtonUI>();
 
-            button.Init(i, this);
-            buttons.Add(button);
-        }
+        //    button.Init(i, this);
+        //    buttons.Add(button);
+        //}
 
         closeButton.onClick.AddListener(OnClickCloseButton);
         bgCloseButton.onClick.AddListener(OnClickCloseButton);

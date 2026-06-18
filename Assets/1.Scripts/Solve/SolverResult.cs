@@ -8,17 +8,29 @@ public class SolverResult
 
     public List<int> Path = new();
 
+    // 실패 디버깅용
+    public int MaxSolvedArrows;
+
+    public int RemainArrows;
+
+    public SolverState BestState;
+
+    public int VisitedCount;
+
     public string Difficulty
     {
         get
         {
-            if (MinMoves <= 3)
+            if (!CanSolve)
+                return "Impossible";
+
+            if (MinMoves <= 10)
                 return "Easy";
 
-            if (MinMoves <= 8)
+            if (MinMoves <= 20)
                 return "Medium";
 
-            if (MinMoves <= 15)
+            if (MinMoves <= 30)
                 return "Hard";
 
             return "Expert";

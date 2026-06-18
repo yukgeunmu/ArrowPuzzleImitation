@@ -35,7 +35,7 @@ public class StageButtonUI : MonoBehaviour
 
     public void Unlock()
     {
-        unlocked = stageIndex <= SaveManager.CurrentStage;
+        //unlocked = stageIndex <= SaveManager.CurrentStage;
         button.interactable = unlocked;
     }
 }

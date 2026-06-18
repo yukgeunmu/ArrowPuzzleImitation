@@ -4,23 +4,21 @@ using UnityEngine.UI;
 
 public class HUDUI : SceneUI
 {
+
     [SerializeField]
-    private TMP_Text stageText;
+    private TextMeshProUGUI timerText;
 
     [SerializeField]
     private Button undoButton;
 
     [SerializeField]
-    private Button restartButton;
-
-    [SerializeField]
-    private Button resetButton;
-
-    [SerializeField]
-    private Button stageSelectButton;
+    private Button backButton;
 
     [SerializeField]
     private Button hintButton;
+
+    [SerializeField]
+    private Button exitButton;
 
 
     private void Awake()
@@ -33,16 +31,10 @@ public class HUDUI : SceneUI
         Open();
 
         undoButton.onClick.AddListener(OnUndo);
-        restartButton.onClick.AddListener(OnRestart);
-        resetButton.onClick.AddListener(OnReset);
-        stageSelectButton.onClick.AddListener(OpenStageSelect);
+        backButton.onClick.AddListener(OnRestart);
         hintButton.onClick.AddListener(OnHint);
+        exitButton.onClick.AddListener(OnClickExit);
 
-    }
-
-    public void SetStage(int stage)
-    {
-        stageText.text = $"Stage {stage}";
     }
 
     private void OnUndo()
@@ -54,32 +46,38 @@ public class HUDUI : SceneUI
 
     private void OnRestart()
     {
-        OnClickAnimation(restartButton);
+        OnClickAnimation(backButton);
         Manager.Instance.Sound.Play(SFXType.Button);
-        Manager.Instance.Stage.RetryStage();
-    }
-
-    private void OnReset()
-    {
-        OnClickAnimation(resetButton);
-        Manager.Instance.Sound.Play(SFXType.Button);
-        Manager.Instance.Stage.ResetProgress();
-    }
-
-
-    private void OpenStageSelect()
-    {
-        OnClickAnimation(stageSelectButton);
-        Manager.Instance.Sound.Play(SFXType.Button);
-        Manager.Instance.UI.ShowPopup<StageSelectPopupUI>();
+        Manager.Instance.Stage.BackLevelSelectStage();
     }
 
     private void OnHint()
     {
         OnClickAnimation(hintButton);
         Manager.Instance.Sound.Play(SFXType.Button);
-        Manager.Instance.Hint.ShowHint();
+        SolverArrow solverArrow = Manager.Instance.Hint.GetHintArrow();
+
+        if(solverArrow == null)
+        {
+            Manager.Instance.Hint.ShowHint();
+        }
+        else
+        {
+            ArrowBlock arrow = Manager.Instance.Stage.GetArrowById(solverArrow.Id);
+            arrow.PlayHint();
+        }
     }
 
+    private void OnClickExit()
+    {
+        OnClickAnimation(exitButton);
+
+        Manager.Instance.ExitGame();
+    }
+
+    public void SetTimer(float elapsed)
+    {
+        timerText.text = Manager.Instance.UI.FormatTime(elapsed);
+    }
 
 }

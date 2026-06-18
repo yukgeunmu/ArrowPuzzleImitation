@@ -1,4 +1,5 @@
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,20 +9,22 @@ public class ClearPopupUI : PopupUI
     private Button nextButton;
 
     [SerializeField]
-    private Button retryButton;
+    private TextMeshProUGUI clearTimeText;
+
+    [SerializeField]
+    private TextMeshProUGUI bestTimeText;
 
     private void Awake()
     {
         Init();
     }
 
+
     public void Init()
     {
         Open();
 
         nextButton.onClick.AddListener(OnClickNextButton);
-
-        retryButton.onClick.AddListener(OnClickRetryButton);
     }
 
 
@@ -42,9 +45,13 @@ public class ClearPopupUI : PopupUI
         Manager.Instance.Stage.NextStage();
     }
 
-    public void OnClickRetryButton()
+    public void SetTime(Difficulty difficulty,float clearTime)
     {
-        OnClickAnimation(retryButton);
-        Manager.Instance.Stage.RetryStage();
+        clearTimeText.text = $"TIME: {Manager.Instance.UI.FormatTime(clearTime)}";
+
+        float bestTime = Manager.Instance.Save.GetBestRecord(difficulty);
+
+        bestTimeText.text = $"BEST: {Manager.Instance.UI.FormatTime(bestTime)}";
     }
+
 }

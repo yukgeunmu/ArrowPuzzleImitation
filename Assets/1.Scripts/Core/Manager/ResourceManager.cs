@@ -102,7 +102,7 @@ public class ResourceManager
     {
         if (!tableCache.TryGetValue(tableKey, out object value))
             return null;
-        
+
 
         Dictionary<string, T> table = value as Dictionary<string, T>;
 
@@ -110,7 +110,7 @@ public class ResourceManager
 
         if (table == null)
             return null;
-        
+
         table.TryGetValue(dataKey, out T data);
 
         return data;

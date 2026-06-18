@@ -1,16 +1,8 @@
-using Codice.CM.Common;
+using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-
-[System.Serializable]
-public class ArrowData
-{
-    public List<Vector3> Cells = new();
-
-    public Direction HeadDirection;
-}
-
+using UnityEngine.Audio;
 
 public class StagePathEditorWindow : EditorWindow
 {
@@ -21,6 +13,8 @@ public class StagePathEditorWindow : EditorWindow
 
     private int width = 10;
     private int height = 10;
+    private int minLen = 2;
+    private int maxLen = 5;
 
     private Texture2D referenceImage;
 
@@ -28,12 +22,27 @@ public class StagePathEditorWindow : EditorWindow
 
 
     private readonly List<Vector3> currentPath = new();
-    private readonly List<ArrowData> arrows = new();
+    private List<ArrowData> arrows = new();
     private ArrowData selectedArrow;
 
     private bool isDragging;
 
     private StageDataSO currentStage;
+
+    private readonly Stack<EditorAction> undoStack = new();
+
+    private readonly Stack<EditorAction> redoStack = new();
+
+    private bool? solveResult;
+
+    private int solveDepth;
+
+    private string solveDifficulty;
+
+    private List<int> solutionPath = new();
+
+    private int targetMoves = 10;
+    private int generateTryCount = 100;
 
 
     [MenuItem("Tools/Arrow Puzzle/Stage Path Editor")]
@@ -71,6 +80,16 @@ public class StagePathEditorWindow : EditorWindow
                 "Height",
                 height);
 
+        minLen =
+            EditorGUILayout.IntField(
+                "MinLength",
+                minLen);
+
+        maxLen =
+            EditorGUILayout.IntField(
+                "MaxLength",
+                maxLen);
+
         referenceImage =
             (Texture2D)EditorGUILayout.ObjectField(
                 "Reference Image",
@@ -78,7 +97,7 @@ public class StagePathEditorWindow : EditorWindow
                 typeof(Texture2D),
                 false);
 
-        currentStage = (StageDataSO)EditorGUILayout.ObjectField( "Stage",currentStage, typeof(StageDataSO), false);
+        currentStage = (StageDataSO)EditorGUILayout.ObjectField("Stage", currentStage, typeof(StageDataSO), false);
 
         EditorGUILayout.BeginHorizontal();
 
@@ -111,6 +130,30 @@ public class StagePathEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.Space();
+
+        targetMoves =
+            EditorGUILayout.IntField(
+                "Target Moves",
+                targetMoves);
+
+        generateTryCount =
+            EditorGUILayout.IntField(
+                "Max Retry",
+                generateTryCount);
+
+        if (GUILayout.Button("Generate"))
+        {
+            GenerateStage();
+        }
+
+
+
+        if (GUILayout.Button("Solve"))
+        {
+            RunSolver();
+        }
+
 
         GUILayout.Space(5);
 
@@ -120,11 +163,49 @@ public class StagePathEditorWindow : EditorWindow
                 cellSize,
                 10f,
                 100f);
+
+
+        if (solveResult.HasValue)
+        {
+            EditorGUILayout.Space();
+
+            GUI.color =
+                solveResult.Value
+                    ? Color.green
+                    : Color.red;
+
+            EditorGUILayout.LabelField(
+                solveResult.Value
+                    ? "Clearable"
+                    : "Impossible");
+
+            GUI.color = Color.white;
+
+            EditorGUILayout.LabelField(solveDifficulty);
+
+            if (solveResult.Value)
+            {
+                EditorGUILayout.LabelField(
+                    $"Depth : {solveDepth}");
+            }
+
+            if (solutionPath.Count > 0)
+            {
+                string text =
+                    string.Join(
+                        " -> ",
+                        solutionPath);
+
+                EditorGUILayout.HelpBox(
+                    text,
+                    MessageType.Info);
+            }
+        }
     }
 
     private void DrawCanvas()
     {
-        Rect gridRect = GUILayoutUtility.GetRect( width * cellSize, height * cellSize);
+        Rect gridRect = GUILayoutUtility.GetRect(width * cellSize, height * cellSize);
 
         DrawBackground(gridRect);
 
@@ -146,7 +227,7 @@ public class StagePathEditorWindow : EditorWindow
 
         for (int i = 0; i < currentPath.Count - 1; i++)
         {
-            Vector2 p1 = GetCellCenter( gridRect,
+            Vector2 p1 = GetCellCenter(gridRect,
                     currentPath[i]);
 
             Vector2 p2 =
@@ -160,7 +241,7 @@ public class StagePathEditorWindow : EditorWindow
         }
     }
 
-    private Vector2 GetCellCenter( Rect gridRect, Vector3 cell)
+    private Vector2 GetCellCenter(Rect gridRect, Vector3 cell)
     {
         return new Vector2(
             gridRect.x +
@@ -237,7 +318,7 @@ public class StagePathEditorWindow : EditorWindow
         e.Use();
     }
 
-    private void HandleGridInput( Rect gridRect, Event e)
+    private void HandleGridInput(Rect gridRect, Event e)
     {
         Vector2 mousePos = e.mousePosition;
 
@@ -250,16 +331,16 @@ public class StagePathEditorWindow : EditorWindow
 
             currentPath.Clear();
 
-            currentPath.Add(GetCellPosition(gridRect,mousePos));
+            currentPath.Add(GetCellPosition(gridRect, mousePos));
 
             isDragging = true;
 
             e.Use();
         }
 
-        if(isDragging && e.type == EventType.MouseDrag)
+        if (isDragging && e.type == EventType.MouseDrag)
         {
-            Vector3  cell = GetCellPosition(gridRect, mousePos);
+            Vector3 cell = GetCellPosition(gridRect, mousePos);
 
             if (!currentPath.Contains(cell))
             {
@@ -270,7 +351,7 @@ public class StagePathEditorWindow : EditorWindow
             e.Use();
         }
 
-        if(isDragging && e.type == EventType.MouseUp)
+        if (isDragging && e.type == EventType.MouseUp)
         {
             isDragging = false;
 
@@ -281,7 +362,7 @@ public class StagePathEditorWindow : EditorWindow
 
         if (e.type == EventType.MouseDown && e.button == 1)
         {
-            selectedArrow =  FindArrowAtPosition(
+            selectedArrow = FindArrowAtPosition(
                     gridRect,
                     mousePos);
 
@@ -301,7 +382,8 @@ public class StagePathEditorWindow : EditorWindow
     }
 
 
-    private Vector3 GetCellPosition( Rect gridRect, Vector2 mousePos)
+    // 마우스 드래그 시 셀 위치 반환
+    private Vector3 GetCellPosition(Rect gridRect, Vector2 mousePos)
     {
         int x = Mathf.FloorToInt((mousePos.x - gridRect.x) / cellSize);
 
@@ -310,7 +392,7 @@ public class StagePathEditorWindow : EditorWindow
         return new Vector3(x, y);
     }
 
-
+    // 머리 방향 설정
     private Direction GetHeadDirection(List<Vector3> path)
     {
         if (path.Count < 2)
@@ -334,6 +416,8 @@ public class StagePathEditorWindow : EditorWindow
         return Direction.Right;
     }
 
+
+    // 생성한 화살 리스트에 추가
     private void CreateArrowFromPath()
     {
         if (currentPath.Count < 2)
@@ -347,43 +431,59 @@ public class StagePathEditorWindow : EditorWindow
 
         arrows.Add(arrow);
 
+        undoStack.Push(new EditorAction
+        {
+            Type = EditorActionType.CreateArrow,
+            Arrow = arrow
+        });
+
+        redoStack.Clear();
+
         currentPath.Clear();
 
         Repaint();
     }
 
+    //선 그리기
     private void DrawSavedArrows(Rect gridRect)
     {
-        foreach (var arrow in arrows)
+
+        for (int i = 0; i < arrows.Count; i++)
         {
+            ArrowData arrow = arrows[i];
+
             Handles.color = arrow == selectedArrow ? Color.red : Color.yellow;
 
-            for (int i = 0; i < arrow.Cells.Count - 1; i++)
+            for (int j = 0; j < arrows[i].Cells.Count - 1; j++)
             {
-                Vector2 p1 = GetCellCenter( gridRect, arrow.Cells[i]);
+                Vector2 p1 = GetCellCenter(gridRect, arrow.Cells[j]);
 
-                Vector2 p2 = GetCellCenter( gridRect,arrow.Cells[i + 1]);
+                Vector2 p2 = GetCellCenter(gridRect, arrow.Cells[j + 1]);
 
-                Handles.DrawLine( p1, p2);
+                Handles.DrawLine(p1, p2);
             }
 
             Vector2 headPos = GetCellCenter(gridRect, arrow.Cells[^1]);
 
+            GUI.Label(new Rect(headPos.x - 20, headPos.y - 20, 30, 20), i.ToString());
+
             DrawArrowHead(headPos, arrow.HeadDirection);
         }
+
     }
 
-    private ArrowData FindArrowAtPosition( Rect gridRect, Vector2 mousePos)
+    //그리드에 화살 위치 감지
+    private ArrowData FindArrowAtPosition(Rect gridRect, Vector2 mousePos)
     {
         foreach (var arrow in arrows)
         {
-            for (int i = 0;i < arrow.Cells.Count - 1; i++)
+            for (int i = 0; i < arrow.Cells.Count - 1; i++)
             {
-                Vector2 p1 =  GetCellCenter( gridRect, arrow.Cells[i]);
+                Vector2 p1 = GetCellCenter(gridRect, arrow.Cells[i]);
 
-                Vector2 p2 = GetCellCenter( gridRect,  arrow.Cells[i + 1]);
+                Vector2 p2 = GetCellCenter(gridRect, arrow.Cells[i + 1]);
 
-                float distance = DistanceToSegment( mousePos, p1, p2);
+                float distance = DistanceToSegment(mousePos, p1, p2);
 
                 if (distance < 10f)
                     return arrow;
@@ -393,11 +493,12 @@ public class StagePathEditorWindow : EditorWindow
         return null;
     }
 
-    private float DistanceToSegment( Vector2 p, Vector2 a,Vector2 b)
+    // 마우스위치와 선 위치 거리 감지
+    private float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
     {
         Vector2 ab = b - a;
 
-        float t = Vector2.Dot( p - a, ab) / ab.sqrMagnitude;
+        float t = Vector2.Dot(p - a, ab) / ab.sqrMagnitude;
 
         t = Mathf.Clamp01(t);
 
@@ -408,18 +509,43 @@ public class StagePathEditorWindow : EditorWindow
             closest);
     }
 
-
-
+    // 키입력
     private void HandleKeyboardInput()
     {
         Event e = Event.current;
 
+        if (e.type != EventType.KeyDown)
+            return;
+
+        if (e.control && e.keyCode == KeyCode.Z)
+        {
+            Undo();
+
+            e.Use();
+        }
+
+        if (e.control && e.keyCode == KeyCode.Y)
+        {
+            Redo();
+
+            e.Use();
+        }
+
+
         if (selectedArrow == null)
             return;
 
-
+        // 화살 제거
         if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Delete)
         {
+            undoStack.Push(new EditorAction
+            {
+                Type = EditorActionType.DeleteArrow,
+                Arrow = selectedArrow
+            });
+
+            redoStack.Clear();
+
             arrows.Remove(selectedArrow);
 
             selectedArrow = null;
@@ -470,7 +596,7 @@ public class StagePathEditorWindow : EditorWindow
 
         Debug.Log("Stage Saved");
     }
-    
+
 
     //저장된 스테이지 불러오기
     private void LoadStage()
@@ -493,7 +619,7 @@ public class StagePathEditorWindow : EditorWindow
 
             foreach (var cell in data.Cells)
             {
-                arrow.Cells.Add( new Vector3( (int)cell.x,(int)cell.y));
+                arrow.Cells.Add(new Vector3((int)cell.x, (int)cell.y));
             }
 
             arrows.Add(arrow);
@@ -523,7 +649,7 @@ public class StagePathEditorWindow : EditorWindow
         if (string.IsNullOrEmpty(path))
             return;
 
-        AssetDatabase.CreateAsset( stage, path);
+        AssetDatabase.CreateAsset(stage, path);
 
         AssetDatabase.SaveAssets();
 
@@ -532,7 +658,7 @@ public class StagePathEditorWindow : EditorWindow
 
 
     //화살 머리 그리기 함수
-    private void DrawArrowHead( Vector2 position, Direction direction)
+    private void DrawArrowHead(Vector2 position, Direction direction)
     {
         const float size = 10f;
 
@@ -581,4 +707,122 @@ public class StagePathEditorWindow : EditorWindow
             position,
             position + right);
     }
+
+
+    // 되돌리기
+    private void Undo()
+    {
+        if (undoStack.Count == 0)
+            return;
+
+        EditorAction action = undoStack.Pop();
+
+        switch (action.Type)
+        {
+            case EditorActionType.CreateArrow:
+
+                arrows.Remove(action.Arrow);
+
+                break;
+
+            case EditorActionType.DeleteArrow:
+
+                arrows.Add(action.Arrow);
+
+                break;
+        }
+
+        redoStack.Push(action);
+
+        Repaint();
+    }
+
+    private void Redo()
+    {
+        if (redoStack.Count == 0)
+            return;
+
+        EditorAction action = redoStack.Pop();
+
+        switch (action.Type)
+        {
+            case EditorActionType.CreateArrow:
+
+                arrows.Add(action.Arrow);
+
+                break;
+
+            case EditorActionType.DeleteArrow:
+
+                arrows.Remove(action.Arrow);
+
+                break;
+        }
+
+        undoStack.Push(action);
+
+        Repaint();
+    }
+
+    private void RunSolver()
+    {
+        SolverState state = BuildSolverState();
+
+        SolverResult result = PuzzleSolver.ValidateGeneratedPuzzle(state);
+
+        solveResult = result.CanSolve;
+
+        solveDepth = result.MinMoves;
+
+        solveDifficulty = result.Difficulty;
+
+        Repaint();
+    }
+
+
+    //SolverState 변환
+    private SolverState BuildSolverState()
+    {
+        int id = 0;
+        SolverState state = new();
+
+        state.Width = width;
+        state.Height = height;
+
+        foreach (ArrowData data in arrows)
+        {
+            SolverArrow arrow = new();
+
+            arrow.Id = id;
+
+            arrow.HeadDirection = data.HeadDirection;
+
+            foreach (var cell in data.Cells)
+            {
+                arrow.Cells.Add(
+                    new Vector3(
+                        cell.x,
+                        cell.y,
+                        0));
+
+            }
+
+            id++;
+
+            state.Arrows.Add(arrow);
+        }
+
+        return state;
+    }
+
+    private void GenerateStage()
+    {
+        AutoGeneratorReverse autoGeneratorReverse = new();
+        arrows = autoGeneratorReverse.Generate(width, height, minLen, maxLen);
+
+        Repaint();
+    }
+
+
 }
+

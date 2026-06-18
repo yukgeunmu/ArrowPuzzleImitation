@@ -5,12 +5,15 @@ public class InputManager
 {
     private Camera mainCam;
 
+    private CameraController mainCamController;
+
     private PlayerInputActions inputActions;
 
     public void Init()
     {
         inputActions = new PlayerInputActions();
         mainCam = Camera.main;
+        mainCamController = mainCam.GetComponent<CameraController>();
     }
 
     public void OnEnable()
@@ -32,6 +35,9 @@ public class InputManager
     {
 
         if (Manager.Instance.UI.HasPopup)
+            return;
+
+        if (mainCamController.IsDragging)
             return;
 
         Vector2 mousePos =  inputActions.Player.Position.ReadValue<Vector2>();
