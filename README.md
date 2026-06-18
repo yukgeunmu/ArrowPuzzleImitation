@@ -131,8 +131,9 @@ BFS Solver를 이용하여 생성된 퍼즐의 정답 여부를 검증
 
 ## 📸 스크린샷
 
-(게임 플레이 이미지 추가 예정)
-
+<p align="center">
+<img width="70%" alt="Image" src="https://github.com/user-attachments/assets/224a1369-b5bd-4dd0-ad14-6a7964901ed8" />
+</p>
 ---
 
 ## 🚀 향후 개발 계획
